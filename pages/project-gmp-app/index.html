@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GMP Inspection Mobile App | Bahri Chiraz</title>
+  <meta name="description" content="Cross-platform mobile app for food safety inspections using Flutter and Node.js - Case study by Bahri Chiraz">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;rect fill='%23a855f7' rx='20' width='100' height='100'/&gt;&lt;text x='50' y='62' font-size='45' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'&gt;BC&lt;/text&gt;&lt;/svg&gt;">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Outfit:wght@300;400;500;600;700;800&amp;family=Noto+Sans+Arabic:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  
+  <style>
+    :root { --bg-primary: #030014; --bg-secondary: #0a0a1f; --accent-purple: #a855f7; --accent-blue: #3b82f6; --accent-cyan: #06b6d4; --neon-purple: #c084fc; --neon-blue: #60a5fa; --text-primary: #ffffff; --text-secondary: rgba(255, 255, 255, 0.6); --text-muted: rgba(255, 255, 255, 0.4); --glass-bg: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.08); --glass-hover: rgba(255, 255, 255, 0.06); }
+    * { box-sizing: border-box; margin: 0; padding: 0; } html { scroll-behavior: smooth; }
+    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: var(--bg-primary); } ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--accent-purple), var(--accent-blue)); border-radius: 4px; }
+    .gradient-orbs { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: orbFloat 20s ease-in-out infinite; }
+    .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%); top: -150px; right: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%); bottom: -100px; left: -100px; animation-delay: -10s; }
+    @keyframes orbFloat { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(30px, -30px) scale(1.05); } }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 1.25rem 3rem; display: flex; justify-content: space-between; align-items: center; background: rgba(3, 0, 20, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); }
+    .logo { font-family: 'Outfit', sans-serif; font-size: 1.75rem; font-weight: 800; background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .back-link { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+    .back-link:hover { color: var(--accent-purple); gap: 0.75rem; } .back-link svg { width: 20px; height: 20px; }
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
+    .nav-dropdown-btn:hover { color: var(--accent-purple); border-color: var(--accent-purple); }
+    .nav-dropdown-btn svg { width: 16px; height: 16px; transition: transform 0.3s ease; }
+    .nav-dropdown:hover .nav-dropdown-btn svg { transform: rotate(180deg); }
+    .nav-dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 0.5rem; min-width: 260px; background: rgba(10, 10, 31, 0.95); border: 1px solid var(--glass-border); border-radius: 12px; padding: 0.5rem; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; backdrop-filter: blur(20px); }
+    .nav-dropdown:hover .nav-dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+    .nav-dropdown-menu a { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s ease; }
+    .nav-dropdown-menu a:hover { background: var(--glass-hover); color: var(--text-primary); }
+    .nav-dropdown-menu a.active { background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1)); color: var(--neon-purple); }
+    .nav-dropdown-menu a svg { width: 18px; height: 18px; opacity: 0.6; }
+    .nav-dropdown-divider { height: 1px; background: var(--glass-border); margin: 0.5rem 0; }
+    .project-hero { padding: 10rem 3rem 5rem; position: relative; }
+    .project-hero-content { max-width: 1200px; margin: 0 auto; }
+    .project-meta { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .project-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 100px; font-size: 0.85rem; color: var(--text-secondary); }
+    .project-badge.company { background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.1)); border-color: var(--accent-purple); color: var(--neon-purple); }
+    .project-hero h1 { font-family: 'Outfit', sans-serif; font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -0.03em; }
+    .project-hero h1 .gradient-text { background: linear-gradient(135deg, var(--neon-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .project-intro { font-size: 1.25rem; color: var(--text-secondary); max-width: 700px; line-height: 1.7; margin-bottom: 2rem; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .project-tag { padding: 0.5rem 1rem; background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1)); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 100px; font-size: 0.9rem; font-weight: 500; color: var(--neon-purple); }
+    .project-gallery { padding: 0 3rem 5rem; }
+    .gallery-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .gallery-item { border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); transition: all 0.3s ease; }
+    .gallery-item:hover { border-color: var(--accent-purple); transform: scale(1.02); }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+    .project-content { max-width: 1200px; margin: 0 auto; padding: 0 3rem; }
+    .content-grid { display: grid; grid-template-columns: 1fr 350px; gap: 4rem; }
+    .content-main { display: flex; flex-direction: column; gap: 4rem; }
+    .content-section h2 { font-family: 'Outfit', sans-serif; font-size: 1.75rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.75rem; }
+    .content-section h2 .icon { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.2)); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+    .content-section p { color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 1rem; }
+    .content-section ul { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+    .content-section li { color: var(--text-secondary); font-size: 1rem; padding-left: 1.75rem; position: relative; line-height: 1.7; }
+    .content-section li::before { content: '→'; position: absolute; left: 0; color: var(--accent-purple); font-weight: 600; }
+    .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1.5rem; }
+    .result-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; text-align: center; transition: all 0.3s ease; }
+    .result-card:hover { border-color: var(--accent-purple); transform: translateY(-5px); }
+    .result-value { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--neon-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.25rem; }
+    .result-label { color: var(--text-secondary); font-size: 0.9rem; }
+    .content-sidebar { display: flex; flex-direction: column; gap: 2rem; }
+    .sidebar-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 1.75rem; }
+    .sidebar-card h3 { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--text-primary); }
+    .info-list { display: flex; flex-direction: column; gap: 1rem; }
+    .info-item { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; border-bottom: 1px solid var(--glass-border); }
+    .info-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .info-label { color: var(--text-muted); font-size: 0.9rem; } .info-value { color: var(--text-primary); font-weight: 600; font-size: 0.95rem; }
+    .tech-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tech-item { padding: 0.4rem 0.85rem; background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1)); border-radius: 100px; font-size: 0.8rem; font-weight: 500; color: var(--neon-purple); }
+    .project-cta { margin-top: 5rem; padding: 4rem; background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.05)); border: 1px solid var(--glass-border); border-radius: 24px; text-align: center; }
+    .project-cta h3 { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+    .project-cta p { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 2rem; border-radius: 12px; font-size: 1rem; font-weight: 600; text-decoration: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; border: none; font-family: inherit; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); color: white; box-shadow: 0 0 30px rgba(168, 85, 247, 0.4); }
+    .btn-primary:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 0 50px rgba(168, 85, 247, 0.6); }
+    .project-nav { max-width: 1200px; margin: 5rem auto 0; padding: 3rem; display: flex; justify-content: space-between; border-top: 1px solid var(--glass-border); }
+    .nav-item { display: flex; flex-direction: column; gap: 0.5rem; text-decoration: none; transition: all 0.3s ease; }
+    .nav-item:hover { transform: translateX(10px); } .nav-item.prev:hover { transform: translateX(-10px); }
+    .nav-item.next { text-align: right; align-items: flex-end; }
+    .nav-label { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 0.5rem; }
+    .nav-title { color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700; }
+    .nav-item:hover .nav-title { color: var(--accent-purple); }
+    footer { padding: 3rem; text-align: center; border-top: 1px solid var(--glass-border); margin-top: 3rem; }
+    footer p { color: var(--text-muted); font-size: 0.9rem; }
+    footer .footer-gradient { background: linear-gradient(90deg, var(--neon-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 600; }
+    @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } .content-sidebar { flex-direction: row; flex-wrap: wrap; } .sidebar-card { flex: 1; min-width: 280px; } .gallery-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { nav { padding: 1rem 1.5rem; } .project-hero { padding: 8rem 1.5rem 3rem; } .project-gallery { padding: 0 1.5rem 3rem; } .project-content { padding: 0 1.5rem; } .results-grid { grid-template-columns: 1fr; } .project-cta { padding: 2rem; margin-top: 3rem; } .project-nav { flex-direction: column; gap: 2rem; padding: 2rem 1.5rem; } }
+    @media (max-width: 480px) { nav { padding: 0.85rem 1rem; } .nav-links { gap: 0.5rem; } .back-link span { display: none; } .nav-dropdown-btn { padding: 0.45rem 0.7rem; font-size: 0.8rem; } .nav-dropdown-menu { min-width: 210px; } .lang-switcher { gap: 0.25rem; } .lang-btn { padding: 0.3rem 0.5rem; font-size: 0.72rem; } .project-hero { padding: 7rem 1.1rem 2.5rem; } .project-gallery { padding: 0 1.1rem 2.5rem; } .project-content { padding: 0 1.1rem; } .project-intro { font-size: 1.05rem; } .project-cta { padding: 1.75rem 1.25rem; } .project-cta h3 { font-size: 1.5rem; } .cta-buttons { flex-direction: column; } .cta-buttons .btn { width: 100%; justify-content: center; } .content-section h2 { font-size: 1.4rem; } .result-value { font-size: 2rem; } }
+    .fade-in { opacity: 0; transform: translateY(30px); animation: fadeIn 0.8s ease forwards; }
+    .fade-in-delay-1 { animation-delay: 0.1s; } .fade-in-delay-2 { animation-delay: 0.2s; } .fade-in-delay-3 { animation-delay: 0.3s; } .fade-in-delay-4 { animation-delay: 0.4s; }
+    @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+    .lang-switcher { display: flex; gap: 0.4rem; align-items: center; }
+    .lang-btn { padding: 0.35rem 0.7rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-secondary); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
+    .lang-btn:hover, .lang-btn.active { background: var(--accent-purple); border-color: var(--accent-purple); color: white; }
+    [dir="rtl"] body { font-family: 'Noto Sans Arabic', 'Space Grotesk', sans-serif; }
+    [dir="rtl"] .back-link svg, [dir="rtl"] .nav-item svg, [dir="rtl"] .project-cta .btn svg { transform: scaleX(-1); }
+  </style>
+<script src="https://cdn.moda.app/runtime-libs/tailwind-browser-4.1.13-index.global.min.js"></script><style data-moda-export-fonts="true">@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--thin.ttf") format("truetype"); font-style: normal; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--extralight.ttf") format("truetype"); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--extrabold.ttf") format("truetype"); font-style: normal; font-weight: 800; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--black.ttf") format("truetype"); font-style: normal; font-weight: 900; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--thin.ttf") format("truetype"); font-style: normal; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--extralight.ttf") format("truetype"); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--extrabold.ttf") format("truetype"); font-style: normal; font-weight: 800; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--black.ttf") format("truetype"); font-style: normal; font-weight: 900; font-display: swap; }</style></head>
+<body>
+  <div class="gradient-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+
+  <nav>
+    <a href="/" class="logo">BC</a>
+    <div class="nav-links">
+      <a href="/" class="back-link">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+        <span data-i18n="nav.home">Home</span>
+      </a>
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-btn">
+          <span data-i18n="nav.allProjects">All Projects</span>
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/project-fraud-detection">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            <span data-i18n="nav.p1">Fraud Detection AI</span>
+          </a>
+          <a href="/project-instagram-analytics">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            <span data-i18n="nav.p2">Instagram Analytics</span>
+          </a>
+          <a href="/project-sales-dashboard">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <span data-i18n="nav.p3">Sales &amp; KPI Dashboard</span>
+          </a>
+          <a href="/project-social-media">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+            <span data-i18n="nav.p4">Social Media Analysis</span>
+          </a>
+          <a href="/project-gmp-app" class="active">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+            <span data-i18n="nav.p5">GMP Mobile App</span>
+          </a>
+          <div class="nav-dropdown-divider"></div>
+          <a href="/#projects">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+            <span data-i18n="nav.viewAll">View All Projects</span>
+          </a>
+        </div>
+      </div>
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="fr">FR</button>
+        <button class="lang-btn" data-lang="ar">عربي</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="project-hero">
+    <div class="project-hero-content">
+      <div class="project-meta fade-in">
+        <span class="project-badge company" data-i18n="meta.company">L'EPI D'OR</span>
+        <span class="project-badge" data-i18n="meta.date">📅 Feb - May 2022</span>
+        <span class="project-badge" data-i18n="meta.status">📱 Mobile Development</span>
+      </div>
+      <h1 class="fade-in fade-in-delay-1" data-i18n-html="hero.title">
+        GMP Inspection <span class="gradient-text">Mobile App</span>
+      </h1>
+      <p class="project-intro fade-in fade-in-delay-2" data-i18n="hero.intro">
+        Cross-platform mobile application for food hygiene and safety control, enabling quality inspectors to conduct GMP (Good Manufacturing Practice) inspections efficiently with digital checklists and real-time reporting.
+      </p>
+      <div class="project-tags fade-in fade-in-delay-3">
+        <span class="project-tag">Flutter</span>
+        <span class="project-tag">Dart</span>
+        <span class="project-tag">Node.js</span>
+        <span class="project-tag">MongoDB</span>
+        <span class="project-tag">REST API</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="project-gallery fade-in fade-in-delay-4">
+    <div class="gallery-grid">
+      <div class="gallery-item">
+        <img src="../../images/ecf32221-d428-4dd1-ae03-e21737ee8059.png" alt="Mobile App Screens">
+      </div>
+      <div class="gallery-item">
+        <img src="../../images/1cd99f33-7257-4414-be66-9d87b88f04fe.png" alt="Node.js Backend">
+      </div>
+    </div>
+  </section>
+
+  <div class="project-content">
+    <div class="content-grid">
+      <div class="content-main">
+        
+        <section class="content-section">
+          <h2><span class="icon">🎯</span> <span data-i18n="challenge.h">The Challenge</span></h2>
+          <p data-i18n="challenge.p">
+            L'EPI D'OR, a major food production company, relied on paper-based GMP inspection forms that were inefficient and error-prone:
+          </p>
+          <ul>
+            <li data-i18n="challenge.l1">Paper forms led to data entry delays and transcription errors</li>
+            <li data-i18n="challenge.l2">No real-time visibility into inspection status or compliance issues</li>
+            <li data-i18n="challenge.l3">Difficult to track inspection history and identify recurring problems</li>
+            <li data-i18n="challenge.l4">Inspectors needed offline capability for areas without connectivity</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2><span class="icon">💡</span> <span data-i18n="solution.h">The Solution</span></h2>
+          <p data-i18n="solution.p">
+            I developed a complete mobile inspection solution with offline-first architecture:
+          </p>
+          <ul>
+            <li data-i18n-html="solution.l1"><strong>Flutter App:</strong> Cross-platform mobile app running on both iOS and Android with native performance</li>
+            <li data-i18n-html="solution.l2"><strong>Digital Checklists:</strong> Customizable GMP inspection forms with validation rules and mandatory fields</li>
+            <li data-i18n-html="solution.l3"><strong>Offline Mode:</strong> Full functionality without internet, with automatic sync when connected</li>
+            <li data-i18n-html="solution.l4"><strong>Photo Evidence:</strong> Capture and attach photos to inspection items for documentation</li>
+            <li data-i18n-html="solution.l5"><strong>Node.js Backend:</strong> RESTful API handling authentication, data sync, and report generation</li>
+            <li data-i18n-html="solution.l6"><strong>MongoDB Database:</strong> Flexible document storage for inspection data and history</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2><span class="icon">📈</span> <span data-i18n="results.h">Results &amp; Impact</span></h2>
+          <p data-i18n="results.p">
+            The app transformed the inspection workflow at L'EPI D'OR:
+          </p>
+          <div class="results-grid">
+            <div class="result-card">
+              <div class="result-value">60%</div>
+              <div class="result-label" data-i18n="results.r1">Faster Inspections</div>
+            </div>
+            <div class="result-card">
+              <div class="result-value" data-i18n="results.v2">Zero</div>
+              <div class="result-label" data-i18n="results.r2">Paper Forms</div>
+            </div>
+            <div class="result-card">
+              <div class="result-value" data-i18n="results.v3">Real-time</div>
+              <div class="result-label" data-i18n="results.r3">Compliance Visibility</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2><span class="icon">⚙️</span> <span data-i18n="features.h">Key Features</span></h2>
+          <ul>
+            <li data-i18n-html="features.l1"><strong>User Authentication:</strong> Secure login with role-based access (inspector, supervisor, admin)</li>
+            <li data-i18n-html="features.l2"><strong>Inspection Templates:</strong> Pre-configured GMP checklists for different areas and processes</li>
+            <li data-i18n-html="features.l3"><strong>Scoring System:</strong> Automatic compliance scoring based on inspection results</li>
+            <li data-i18n-html="features.l4"><strong>Photo Documentation:</strong> Attach images to findings with annotations</li>
+            <li data-i18n-html="features.l5"><strong>Offline Sync:</strong> Work without internet, data syncs automatically when connected</li>
+            <li data-i18n-html="features.l6"><strong>PDF Reports:</strong> Generate professional inspection reports for management</li>
+            <li data-i18n-html="features.l7"><strong>Dashboard:</strong> Management view of all inspections, trends, and compliance metrics</li>
+          </ul>
+        </section>
+
+        <div class="project-cta">
+          <h3 data-i18n="cta.h">Need a Mobile App Solution?</h3>
+          <p data-i18n="cta.p">I can build custom mobile applications to digitize your workflows and improve operational efficiency.</p>
+          <div class="cta-buttons">
+            <a href="/#contact" class="btn btn-primary">
+              <span data-i18n="cta.btn">Let's Discuss Your Project</span>
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <aside class="content-sidebar">
+        <div class="sidebar-card">
+          <h3 data-i18n="side.info">Project Info</h3>
+          <div class="info-list">
+            <div class="info-item"><span class="info-label" data-i18n="side.client">Client</span><span class="info-value" data-i18n="side.clientVal">L'EPI D'OR</span></div>
+            <div class="info-item"><span class="info-label" data-i18n="side.duration">Duration</span><span class="info-value" data-i18n="side.durationVal">4 months</span></div>
+            <div class="info-item"><span class="info-label" data-i18n="side.role">Role</span><span class="info-value" data-i18n="side.roleVal">Mobile Developer</span></div>
+            <div class="info-item"><span class="info-label" data-i18n="side.type">Type</span><span class="info-value" data-i18n="side.typeVal">Internship Project</span></div>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h3 data-i18n="side.tech">Technologies Used</h3>
+          <div class="tech-list">
+            <span class="tech-item">Flutter</span>
+            <span class="tech-item">Dart</span>
+            <span class="tech-item">Node.js</span>
+            <span class="tech-item">Express.js</span>
+            <span class="tech-item">MongoDB</span>
+            <span class="tech-item">REST API</span>
+            <span class="tech-item">JWT Auth</span>
+            <span class="tech-item">Hive DB</span>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h3 data-i18n="side.deliverables">Deliverables</h3>
+          <div class="info-list">
+            <div class="info-item"><span class="info-value" data-i18n="del.1">Flutter Mobile App</span></div>
+            <div class="info-item"><span class="info-value" data-i18n="del.2">Node.js REST API</span></div>
+            <div class="info-item"><span class="info-value" data-i18n="del.3">MongoDB Database</span></div>
+            <div class="info-item"><span class="info-value" data-i18n="del.4">Admin Dashboard</span></div>
+            <div class="info-item"><span class="info-value" data-i18n="del.5">Technical Documentation</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <nav class="project-nav">
+      <a href="/project-social-media" class="nav-item prev">
+        <span class="nav-label"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg> <span data-i18n="nav.prev">Previous Project</span></span>
+        <span class="nav-title" data-i18n="nav.prevTitle">Social Media Analysis</span>
+      </a>
+      <a href="/project-fraud-detection" class="nav-item next">
+        <span class="nav-label"><span data-i18n="nav.next">Next Project</span> <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></span>
+        <span class="nav-title" data-i18n="nav.nextTitle">Insurance Fraud Detection AI</span>
+      </a>
+    </nav>
+  </div>
+
+  <footer>
+    <p data-i18n-html="footer">© 2024 <span class="footer-gradient">Bahri Chiraz</span>. Crafted with passion in Nabeul, Tunisia.</p>
+  </footer>
+
+  <script>
+  window.PAGE_TRANSLATIONS = {
+    en: {
+      "nav.home": "Home", "nav.allProjects": "All Projects", "nav.p1": "Fraud Detection AI", "nav.p2": "Instagram Analytics", "nav.p3": "Sales & KPI Dashboard", "nav.p4": "Social Media Analysis", "nav.p5": "GMP Mobile App", "nav.viewAll": "View All Projects",
+      "meta.company": "L'EPI D'OR", "meta.date": "📅 Feb - May 2022", "meta.status": "📱 Mobile Development",
+      "hero.title": "GMP Inspection <span class='gradient-text'>Mobile App</span>",
+      "hero.intro": "Cross-platform mobile application for food hygiene and safety control, enabling quality inspectors to conduct GMP (Good Manufacturing Practice) inspections efficiently with digital checklists and real-time reporting.",
+      "challenge.h": "The Challenge", "challenge.p": "L'EPI D'OR, a major food production company, relied on paper-based GMP inspection forms that were inefficient and error-prone:", "challenge.l1": "Paper forms led to data entry delays and transcription errors", "challenge.l2": "No real-time visibility into inspection status or compliance issues", "challenge.l3": "Difficult to track inspection history and identify recurring problems", "challenge.l4": "Inspectors needed offline capability for areas without connectivity",
+      "solution.h": "The Solution", "solution.p": "I developed a complete mobile inspection solution with offline-first architecture:", "solution.l1": "<strong>Flutter App:</strong> Cross-platform mobile app running on both iOS and Android with native performance", "solution.l2": "<strong>Digital Checklists:</strong> Customizable GMP inspection forms with validation rules and mandatory fields", "solution.l3": "<strong>Offline Mode:</strong> Full functionality without internet, with automatic sync when connected", "solution.l4": "<strong>Photo Evidence:</strong> Capture and attach photos to inspection items for documentation", "solution.l5": "<strong>Node.js Backend:</strong> RESTful API handling authentication, data sync, and report generation", "solution.l6": "<strong>MongoDB Database:</strong> Flexible document storage for inspection data and history",
+      "results.h": "Results & Impact", "results.p": "The app transformed the inspection workflow at L'EPI D'OR:", "results.r1": "Faster Inspections", "results.v2": "Zero", "results.r2": "Paper Forms", "results.v3": "Real-time", "results.r3": "Compliance Visibility",
+      "features.h": "Key Features", "features.l1": "<strong>User Authentication:</strong> Secure login with role-based access (inspector, supervisor, admin)", "features.l2": "<strong>Inspection Templates:</strong> Pre-configured GMP checklists for different areas and processes", "features.l3": "<strong>Scoring System:</strong> Automatic compliance scoring based on inspection results", "features.l4": "<strong>Photo Documentation:</strong> Attach images to findings with annotations", "features.l5": "<strong>Offline Sync:</strong> Work without internet, data syncs automatically when connected", "features.l6": "<strong>PDF Reports:</strong> Generate professional inspection reports for management", "features.l7": "<strong>Dashboard:</strong> Management view of all inspections, trends, and compliance metrics",
+      "cta.h": "Need a Mobile App Solution?", "cta.p": "I can build custom mobile applications to digitize your workflows and improve operational efficiency.", "cta.btn": "Let's Discuss Your Project",
+      "side.info": "Project Info", "side.client": "Client", "side.clientVal": "L'EPI D'OR", "side.duration": "Duration", "side.durationVal": "4 months", "side.role": "Role", "side.roleVal": "Mobile Developer", "side.type": "Type", "side.typeVal": "Internship Project", "side.tech": "Technologies Used", "side.deliverables": "Deliverables",
+      "del.1": "Flutter Mobile App", "del.2": "Node.js REST API", "del.3": "MongoDB Database", "del.4": "Admin Dashboard", "del.5": "Technical Documentation",
+      "nav.prev": "Previous Project", "nav.prevTitle": "Social Media Analysis", "nav.next": "Next Project", "nav.nextTitle": "Insurance Fraud Detection AI",
+      "footer": "© 2024 <span class='footer-gradient'>Bahri Chiraz</span>. Crafted with passion in Nabeul, Tunisia."
+    },
+    fr: {
+      "nav.home": "Accueil", "nav.allProjects": "Tous les projets", "nav.p1": "IA de détection de fraude", "nav.p2": "Analyse Instagram", "nav.p3": "Tableau de bord ventes & KPI", "nav.p4": "Analyse des réseaux sociaux", "nav.p5": "Application mobile GMP", "nav.viewAll": "Voir tous les projets",
+      "meta.company": "L'EPI D'OR", "meta.date": "📅 Fév - Mai 2022", "meta.status": "📱 Développement mobile",
+      "hero.title": "<span class='gradient-text'>Application mobile</span> d'inspection GMP",
+      "hero.intro": "Application mobile multiplateforme pour le contrôle de l'hygiène et de la sécurité alimentaires, permettant aux inspecteurs qualité de réaliser efficacement des inspections GMP (Bonnes Pratiques de Fabrication) avec des listes de contrôle numériques et des rapports en temps réel.",
+      "challenge.h": "Le défi", "challenge.p": "L'EPI D'OR, une grande entreprise de production alimentaire, s'appuyait sur des formulaires d'inspection GMP papier inefficaces et sujets aux erreurs :", "challenge.l1": "Les formulaires papier entraînaient des retards de saisie et des erreurs de transcription", "challenge.l2": "Aucune visibilité en temps réel sur le statut des inspections ou les problèmes de conformité", "challenge.l3": "Difficile de suivre l'historique des inspections et d'identifier les problèmes récurrents", "challenge.l4": "Les inspecteurs avaient besoin d'un mode hors ligne pour les zones sans connexion",
+      "solution.h": "La solution", "solution.p": "J'ai développé une solution d'inspection mobile complète avec une architecture hors ligne d'abord :", "solution.l1": "<strong>Application Flutter :</strong> Une application mobile multiplateforme fonctionnant sur iOS et Android avec des performances natives", "solution.l2": "<strong>Listes de contrôle numériques :</strong> Des formulaires d'inspection GMP personnalisables avec règles de validation et champs obligatoires", "solution.l3": "<strong>Mode hors ligne :</strong> Toutes les fonctionnalités sans internet, avec synchronisation automatique à la reconnexion", "solution.l4": "<strong>Preuve photo :</strong> Capturez et joignez des photos aux éléments d'inspection pour la documentation", "solution.l5": "<strong>Backend Node.js :</strong> Une API RESTful gérant l'authentification, la synchronisation des données et la génération de rapports", "solution.l6": "<strong>Base de données MongoDB :</strong> Un stockage documentaire flexible pour les données et l'historique d'inspection",
+      "results.h": "Résultats & impact", "results.p": "L'application a transformé le flux de travail d'inspection chez L'EPI D'OR :", "results.r1": "Inspections plus rapides", "results.v2": "Zéro", "results.r2": "Formulaires papier", "results.v3": "Temps réel", "results.r3": "Visibilité de conformité",
+      "features.h": "Fonctionnalités clés", "features.l1": "<strong>Authentification utilisateur :</strong> Connexion sécurisée avec accès basé sur les rôles (inspecteur, superviseur, admin)", "features.l2": "<strong>Modèles d'inspection :</strong> Des listes de contrôle GMP préconfigurées pour différentes zones et processus", "features.l3": "<strong>Système de notation :</strong> Une notation de conformité automatique basée sur les résultats d'inspection", "features.l4": "<strong>Documentation photo :</strong> Joignez des images aux constatations avec annotations", "features.l5": "<strong>Synchronisation hors ligne :</strong> Travaillez sans internet, les données se synchronisent automatiquement une fois connecté", "features.l6": "<strong>Rapports PDF :</strong> Générez des rapports d'inspection professionnels pour la direction", "features.l7": "<strong>Tableau de bord :</strong> Une vue de gestion de toutes les inspections, tendances et indicateurs de conformité",
+      "cta.h": "Besoin d'une solution mobile ?", "cta.p": "Je peux créer des applications mobiles sur mesure pour numériser vos flux de travail et améliorer l'efficacité opérationnelle.", "cta.btn": "Discutons de votre projet",
+      "side.info": "Infos du projet", "side.client": "Client", "side.clientVal": "L'EPI D'OR", "side.duration": "Durée", "side.durationVal": "4 mois", "side.role": "Rôle", "side.roleVal": "Développeur mobile", "side.type": "Type", "side.typeVal": "Projet de stage", "side.tech": "Technologies utilisées", "side.deliverables": "Livrables",
+      "del.1": "Application mobile Flutter", "del.2": "API REST Node.js", "del.3": "Base de données MongoDB", "del.4": "Tableau de bord admin", "del.5": "Documentation technique",
+      "nav.prev": "Projet précédent", "nav.prevTitle": "Analyse des réseaux sociaux", "nav.next": "Projet suivant", "nav.nextTitle": "IA de détection de fraude",
+      "footer": "© 2024 <span class='footer-gradient'>Bahri Chiraz</span>. Réalisé avec passion à Nabeul, Tunisie."
+    },
+    ar: {
+      "nav.home": "الرئيسية", "nav.allProjects": "كل المشاريع", "nav.p1": "ذكاء كشف الاحتيال", "nav.p2": "تحليلات إنستغرام", "nav.p3": "لوحة المبيعات و KPI", "nav.p4": "تحليل وسائل التواصل", "nav.p5": "تطبيق GMP الجوال", "nav.viewAll": "عرض كل المشاريع",
+      "meta.company": "L'EPI D'OR", "meta.date": "📅 فبراير - مايو 2022", "meta.status": "📱 تطوير الجوال",
+      "hero.title": "<span class='gradient-text'>تطبيق جوال</span> لتفتيش GMP",
+      "hero.intro": "تطبيق جوال متعدد المنصات لمراقبة سلامة ونظافة الأغذية، يمكّن مفتشي الجودة من إجراء عمليات تفتيش GMP (ممارسات التصنيع الجيدة) بكفاءة باستخدام قوائم تحقق رقمية وتقارير فورية.",
+      "challenge.h": "التحدي", "challenge.p": "اعتمدت L'EPI D'OR، وهي شركة كبرى لإنتاج الأغذية، على نماذج تفتيش GMP ورقية غير فعّالة وعرضة للأخطاء:", "challenge.l1": "أدت النماذج الورقية إلى تأخيرات في إدخال البيانات وأخطاء في النقل", "challenge.l2": "انعدام الرؤية الفورية لحالة التفتيش أو مشكلات الامتثال", "challenge.l3": "صعوبة في تتبع سجل التفتيش وتحديد المشكلات المتكررة", "challenge.l4": "احتاج المفتشون إلى إمكانية العمل دون اتصال في المناطق التي تفتقر للتغطية",
+      "solution.h": "الحل", "solution.p": "طوّرت حلاً متكاملاً للتفتيش عبر الجوال بهندسة تعمل دون اتصال أولاً:", "solution.l1": "<strong>تطبيق Flutter:</strong> تطبيق جوال متعدد المنصات يعمل على iOS وAndroid بأداء أصلي", "solution.l2": "<strong>قوائم تحقق رقمية:</strong> نماذج تفتيش GMP قابلة للتخصيص مع قواعد تحقق وحقول إلزامية", "solution.l3": "<strong>وضع عدم الاتصال:</strong> وظائف كاملة دون إنترنت مع مزامنة تلقائية عند الاتصال", "solution.l4": "<strong>إثبات بالصور:</strong> التقط وأرفق صوراً ببنود التفتيش للتوثيق", "solution.l5": "<strong>خلفية Node.js:</strong> واجهة RESTful تتولى المصادقة ومزامنة البيانات وإنشاء التقارير", "solution.l6": "<strong>قاعدة بيانات MongoDB:</strong> تخزين مستندي مرن لبيانات التفتيش وسجله",
+      "results.h": "النتائج والأثر", "results.p": "حوّل التطبيق سير عمل التفتيش في L'EPI D'OR:", "results.r1": "تفتيش أسرع", "results.v2": "صفر", "results.r2": "نماذج ورقية", "results.v3": "فوري", "results.r3": "رؤية الامتثال",
+      "features.h": "الميزات الرئيسية", "features.l1": "<strong>مصادقة المستخدم:</strong> تسجيل دخول آمن مع وصول حسب الدور (مفتش، مشرف، مسؤول)", "features.l2": "<strong>قوالب التفتيش:</strong> قوائم تحقق GMP معدة مسبقاً لمختلف المناطق والعمليات", "features.l3": "<strong>نظام التقييم:</strong> تقييم امتثال تلقائي بناءً على نتائج التفتيش", "features.l4": "<strong>التوثيق بالصور:</strong> أرفق صوراً بالملاحظات مع التعليقات", "features.l5": "<strong>مزامنة دون اتصال:</strong> اعمل دون إنترنت، وتتم مزامنة البيانات تلقائياً عند الاتصال", "features.l6": "<strong>تقارير PDF:</strong> أنشئ تقارير تفتيش احترافية للإدارة", "features.l7": "<strong>لوحة تحكم:</strong> رؤية إدارية لجميع عمليات التفتيش والاتجاهات ومؤشرات الامتثال",
+      "cta.h": "تحتاج حل تطبيق جوال؟", "cta.p": "يمكنني بناء تطبيقات جوال مخصصة لرقمنة سير عملك وتحسين الكفاءة التشغيلية.", "cta.btn": "لنناقش مشروعك",
+      "side.info": "معلومات المشروع", "side.client": "العميل", "side.clientVal": "L'EPI D'OR", "side.duration": "المدة", "side.durationVal": "4 أشهر", "side.role": "الدور", "side.roleVal": "مطور جوال", "side.type": "النوع", "side.typeVal": "مشروع تدريب", "side.tech": "التقنيات المستخدمة", "side.deliverables": "المخرجات",
+      "del.1": "تطبيق جوال Flutter", "del.2": "واجهة REST بـ Node.js", "del.3": "قاعدة بيانات MongoDB", "del.4": "لوحة تحكم المسؤول", "del.5": "توثيق تقني",
+      "nav.prev": "المشروع السابق", "nav.prevTitle": "تحليل وسائل التواصل", "nav.next": "المشروع التالي", "nav.nextTitle": "ذكاء كشف الاحتيال في التأمين",
+      "footer": "© 2024 <span class='footer-gradient'>Bahri Chiraz</span>. صُنع بشغف في نابل، تونس."
+    }
+  };
+  </script>
+  <script src="/js/i18n-project.js"></script>
+
+</body></html>

@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insurance Fraud Detection AI | Bahri Chiraz</title>
+  <meta name="description" content="AI-powered fraud detection system for insurance contracts - Case study by Bahri Chiraz, Data &amp; BI Analyst">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;rect fill='%23a855f7' rx='20' width='100' height='100'/&gt;&lt;text x='50' y='62' font-size='45' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'&gt;BC&lt;/text&gt;&lt;/svg&gt;">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Outfit:wght@300;400;500;600;700;800&amp;family=Noto+Sans+Arabic:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-primary: #030014;
+      --bg-secondary: #0a0a1f;
+      --accent-purple: #a855f7;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --neon-purple: #c084fc;
+      --neon-blue: #60a5fa;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.6);
+      --text-muted: rgba(255, 255, 255, 0.4);
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-hover: rgba(255, 255, 255, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { 
+      background: linear-gradient(180deg, var(--accent-purple), var(--accent-blue)); 
+      border-radius: 4px; 
+    }
+
+    .gradient-orbs {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      animation: orbFloat 20s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%);
+      top: -150px;
+      right: -100px;
+    }
+
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+      bottom: -100px;
+      left: -100px;
+      animation-delay: -10s;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -30px) scale(1.05); }
+    }
+
+    /* Navigation */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 1.25rem 3rem; display: flex; justify-content: space-between; align-items: center; background: rgba(3, 0, 20, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); }
+    .logo { font-family: 'Outfit', sans-serif; font-size: 1.75rem; font-weight: 800; background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .back-link { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+    .back-link:hover { color: var(--accent-purple); gap: 0.75rem; } .back-link svg { width: 20px; height: 20px; }
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
+    .nav-dropdown-btn:hover { color: var(--accent-purple); border-color: var(--accent-purple); }
+    .nav-dropdown-btn svg { width: 16px; height: 16px; transition: transform 0.3s ease; }
+    .nav-dropdown:hover .nav-dropdown-btn svg { transform: rotate(180deg); }
+    .nav-dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 0.5rem; min-width: 260px; background: rgba(10, 10, 31, 0.95); border: 1px solid var(--glass-border); border-radius: 12px; padding: 0.5rem; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; backdrop-filter: blur(20px); }
+    .nav-dropdown:hover .nav-dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+    .nav-dropdown-menu a { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s ease; }
+    .nav-dropdown-menu a:hover { background: var(--glass-hover); color: var(--text-primary); }
+    .nav-dropdown-menu a.active { background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1)); color: var(--neon-purple); }
+    .nav-dropdown-menu a svg { width: 18px; height: 18px; opacity: 0.6; }
+    .nav-dropdown-divider { height: 1px; background: var(--glass-border); margin: 0.5rem 0; }
+
+    /* Project Hero */
+    .project-hero {
+      padding: 10rem 3rem 5rem;
+      position: relative;
+    }
+
+    .project-hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .project-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .project-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .project-badge.company {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.1));
+      border-color: var(--accent-purple);
+      color: var(--neon-purple);
+    }
+
+    .project-hero h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.03em;
+    }
+
+    .project-hero h1 .gradient-text {
+      background: linear-gradient(135deg, var(--neon-purple), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .project-intro {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      max-width: 700px;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .project-tag {
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1));
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 100px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--neon-purple);
+    }
+
+    /* Project Gallery */
+    .project-gallery {
+      padding: 0 3rem 5rem;
+    }
+
+    .gallery-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .gallery-main {
+      grid-row: span 2;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+    }
+
+    .gallery-main img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .gallery-thumb {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      transition: all 0.3s ease;
+    }
+
+    .gallery-thumb:hover {
+      border-color: var(--accent-purple);
+      transform: scale(1.02);
+    }
+
+    .gallery-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Content Sections */
+    .project-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 3rem;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 4rem;
+    }
+
+    .content-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4rem;
+    }
+
+    .content-section h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .content-section h2 .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+
+    .content-section p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    .content-section ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .content-section li {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      padding-left: 1.75rem;
+      position: relative;
+      line-height: 1.7;
+    }
+
+    .content-section li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent-purple);
+      font-weight: 600;
+    }
+
+    /* Results/Metrics */
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .result-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .result-card:hover {
+      border-color: var(--accent-purple);
+      transform: translateY(-5px);
+    }
+
+    .result-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--neon-purple), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* Sidebar */
+    .content-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .sidebar-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 1.75rem;
+    }
+
+    .sidebar-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      color: var(--text-primary);
+    }
+
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .info-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-label {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .info-value {
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .tech-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tech-item {
+      padding: 0.4rem 0.85rem;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1));
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--neon-purple);
+    }
+
+    /* CTA Section */
+    .project-cta {
+      margin-top: 5rem;
+      padding: 4rem;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.05));
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      text-align: center;
+    }
+
+    .project-cta h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .project-cta p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+      color: white;
+      box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 0 50px rgba(168, 85, 247, 0.6);
+    }
+
+    .btn-secondary {
+      background: var(--glass-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--glass-hover);
+      transform: translateY(-4px);
+      border-color: var(--accent-purple);
+    }
+
+    /* Project Navigation */
+    .project-nav {
+      max-width: 1200px;
+      margin: 5rem auto 0;
+      padding: 3rem;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav-item:hover {
+      transform: translateX(10px);
+    }
+
+    .nav-item.prev:hover {
+      transform: translateX(-10px);
+    }
+
+    .nav-item.next {
+      text-align: right;
+      align-items: flex-end;
+    }
+
+    .nav-label {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-title {
+      color: var(--text-primary);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .nav-item:hover .nav-title {
+      color: var(--accent-purple);
+    }
+
+    /* Footer */
+    footer {
+      padding: 3rem;
+      text-align: center;
+      border-top: 1px solid var(--glass-border);
+      margin-top: 3rem;
+    }
+
+    footer p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    footer .footer-gradient {
+      background: linear-gradient(90deg, var(--neon-purple), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+      .content-sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .sidebar-card {
+        flex: 1;
+        min-width: 280px;
+      }
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+      .gallery-main {
+        grid-row: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .project-hero { padding: 8rem 1.5rem 3rem; }
+      .project-gallery { padding: 0 1.5rem 3rem; }
+      .project-content { padding: 0 1.5rem; }
+      .results-grid { grid-template-columns: 1fr; }
+      .project-cta { padding: 2rem; margin-top: 3rem; }
+      .project-nav { flex-direction: column; gap: 2rem; padding: 2rem 1.5rem; }
+      .nav-item.next { text-align: left; align-items: flex-start; }
+      .nav-item:hover, .nav-item.prev:hover { transform: none; }
+    }
+
+    @media (max-width: 480px) {
+      nav { padding: 0.85rem 1rem; }
+      .nav-links { gap: 0.5rem; }
+      .back-link span { display: none; }
+      .nav-dropdown-btn { padding: 0.45rem 0.7rem; font-size: 0.8rem; }
+      .nav-dropdown-menu { min-width: 210px; }
+      .lang-switcher { gap: 0.25rem; }
+      .lang-btn { padding: 0.3rem 0.5rem; font-size: 0.72rem; }
+      .project-hero { padding: 7rem 1.1rem 2.5rem; }
+      .project-gallery { padding: 0 1.1rem 2.5rem; }
+      .project-content { padding: 0 1.1rem; }
+      .project-intro { font-size: 1.05rem; }
+      .project-cta { padding: 1.75rem 1.25rem; }
+      .project-cta h3 { font-size: 1.5rem; }
+      .cta-buttons { flex-direction: column; }
+      .cta-buttons .btn { width: 100%; justify-content: center; }
+      .content-section h2 { font-size: 1.4rem; }
+      .result-value { font-size: 2rem; }
+    }
+
+    /* Animations */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    .fade-in-delay-1 { animation-delay: 0.1s; }
+    .fade-in-delay-2 { animation-delay: 0.2s; }
+    .fade-in-delay-3 { animation-delay: 0.3s; }
+    .fade-in-delay-4 { animation-delay: 0.4s; }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Captioned analysis gallery */
+    .analysis-gallery { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .analysis-gallery figure { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column; }
+    .analysis-gallery figure:hover { border-color: var(--accent-purple); transform: translateY(-4px); }
+    .analysis-gallery img { width: 100%; height: auto; display: block; }
+    .analysis-gallery figcaption { padding: 0.85rem 1.1rem; color: var(--text-secondary); font-size: 0.9rem; border-top: 1px solid var(--glass-border); }
+    @media (max-width: 768px) { .analysis-gallery { grid-template-columns: 1fr; } }
+
+    /* Language Switcher */
+    .lang-switcher { display: flex; gap: 0.4rem; align-items: center; }
+    .lang-btn { padding: 0.35rem 0.7rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-secondary); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
+    .lang-btn:hover, .lang-btn.active { background: var(--accent-purple); border-color: var(--accent-purple); color: white; }
+    /* RTL support */
+    [dir="rtl"] body { font-family: 'Noto Sans Arabic', 'Space Grotesk', sans-serif; }
+    [dir="rtl"] .back-link svg, [dir="rtl"] .nav-item svg, [dir="rtl"] .project-cta .btn svg { transform: scaleX(-1); }
+  </style>
+<script src="https://cdn.moda.app/runtime-libs/tailwind-browser-4.1.13-index.global.min.js"></script><style data-moda-export-fonts="true">@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--thin.ttf") format("truetype"); font-style: normal; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--extralight.ttf") format("truetype"); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--extrabold.ttf") format("truetype"); font-style: normal; font-weight: 800; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--black.ttf") format("truetype"); font-style: normal; font-weight: 900; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--thin.ttf") format("truetype"); font-style: normal; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--extralight.ttf") format("truetype"); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--extrabold.ttf") format("truetype"); font-style: normal; font-weight: 800; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--black.ttf") format("truetype"); font-style: normal; font-weight: 900; font-display: swap; }</style></head>
+<body>
+  <div class="gradient-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="/" class="logo">BC</a>
+    <div class="nav-links">
+      <a href="/" class="back-link">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+        <span data-i18n="nav.home">Home</span>
+      </a>
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-btn">
+          <span data-i18n="nav.allProjects">All Projects</span>
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/project-fraud-detection" class="active">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            <span data-i18n="nav.p1">Fraud Detection AI</span>
+          </a>
+          <a href="/project-instagram-analytics">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            <span data-i18n="nav.p2">Instagram Analytics</span>
+          </a>
+          <a href="/project-sales-dashboard">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <span data-i18n="nav.p3">Sales &amp; KPI Dashboard</span>
+          </a>
+          <a href="/project-social-media">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+            <span data-i18n="nav.p4">Social Media Analysis</span>
+          </a>
+          <a href="/project-gmp-app">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+            <span data-i18n="nav.p5">GMP Mobile App</span>
+          </a>
+          <div class="nav-dropdown-divider"></div>
+          <a href="/#projects">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+            <span data-i18n="nav.viewAll">View All Projects</span>
+          </a>
+        </div>
+      </div>
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="fr">FR</button>
+        <button class="lang-btn" data-lang="ar">عربي</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Project Hero -->
+  <section class="project-hero">
+    <div class="project-hero-content">
+      <div class="project-meta fade-in">
+        <span class="project-badge company">NEOPOLIS</span>
+        <span class="project-badge" data-i18n="meta.date">📅 Feb - Jun 2024</span>
+        <span class="project-badge" data-i18n="meta.type">🎯 End-of-Studies Project</span>
+      </div>
+      <h1 class="fade-in fade-in-delay-1" data-i18n-html="hero.title">
+        Insurance <span class="gradient-text">Fraud Detection</span> AI System
+      </h1>
+      <p class="project-intro fade-in fade-in-delay-2" data-i18n="hero.intro">
+        Developed an AI-powered system to detect and analyze fraudulent insurance contracts, featuring machine learning models, ETL pipelines, interactive dashboards, and a full-stack web application.
+      </p>
+      <div class="project-tags fade-in fade-in-delay-3">
+        <span class="project-tag">Python</span>
+        <span class="project-tag">Machine Learning</span>
+        <span class="project-tag">Power BI</span>
+        <span class="project-tag">Talend ETL</span>
+        <span class="project-tag">Flask</span>
+        <span class="project-tag">ReactJS</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Project Gallery -->
+  <section class="project-gallery fade-in fade-in-delay-4">
+    <div class="analysis-gallery">
+      <figure>
+        <img src="../../images/9b91b2d5-f13f-4575-8176-64ece9b55bab.png" alt="Power BI dashboard - insurance contracts overview">
+        <figcaption data-i18n="gal.1">Power BI — contracts overview dashboard (Les Affaires)</figcaption>
+      </figure>
+      <figure>
+        <img src="../../images/f9eb949a-b8c6-486e-beb9-3b933533009a.png" alt="Power BI dashboard - fraud analysis">
+        <figcaption data-i18n="gal.2">Power BI — fraud analysis by user, type &amp; status (Les Fraudes)</figcaption>
+      </figure>
+      <figure>
+        <img src="../../images/1a8825bb-a2e7-4418-b5d5-7ccfbd094a02.png" alt="Power BI dashboard - fraud geographic distribution map">
+        <figcaption data-i18n="gal.3">Power BI — geographic distribution of fraud across France</figcaption>
+      </figure>
+      <figure>
+        <img src="../../images/5dbd7f4f-022d-4715-8857-553dee46e668.png" alt="Snowflake data warehouse schema">
+        <figcaption data-i18n="gal.4">Data warehouse — snowflake schema (fact &amp; dimension tables)</figcaption>
+      </figure>
+      <figure>
+        <img src="../../images/c8559063-dbe3-4d78-baf9-a52bcc7da615.png" alt="Talend ETL job pipeline">
+        <figcaption data-i18n="gal.5">Talend ETL — affaire ingestion job (filter, dedupe, map, load)</figcaption>
+      </figure>
+      <figure>
+        <img src="../../images/a962e2b9-3ce5-46b2-b083-ee36914bab32.png" alt="Talend tMap field mapping">
+        <figcaption data-i18n="gal.6">Talend tMap — source-to-target field mapping</figcaption>
+      </figure>
+      <figure>
+        <img src="../../images/31f209c8-5b49-481c-beb8-b637ec2617aa.png" alt="SQL table creation query">
+        <figcaption data-i18n="gal.7">SQL — Affaire table schema definition</figcaption>
+      </figure>
+      <figure>
+        <img src="../../images/0ba06bb7-0710-49e0-9251-6939d522f65c.png" alt="Random Forest classification report">
+        <figcaption data-i18n="gal.8">ML results — Random Forest classification report (97% accuracy)</figcaption>
+      </figure>
+      <figure>
+        <img src="../../images/36f6589c-df79-495f-97c6-fb4510de6a87.png" alt="Python preprocessing and feature engineering code">
+        <figcaption data-i18n="gal.9">Python — data loading, merging &amp; feature encoding</figcaption>
+      </figure>
+      <figure>
+        <img src="../../images/d95f4465-7921-4008-a49f-58fff8f14936.png" alt="Python SVM model training with GridSearchCV">
+        <figcaption data-i18n="gal.10">Python — SVM training &amp; hyperparameter tuning (GridSearchCV)</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Project Content -->
+  <div class="project-content">
+    <div class="content-grid">
+      <div class="content-main">
+        
+        <!-- Challenge -->
+        <section class="content-section">
+          <h2><span class="icon">🎯</span> <span data-i18n="challenge.h">The Challenge</span></h2>
+          <p data-i18n="challenge.p">
+            NEOPOLIS, a leading insurance technology company, faced significant financial losses due to fraudulent insurance claims. Manual detection methods were time-consuming, inconsistent, and failed to identify sophisticated fraud patterns. They needed an intelligent system capable of:
+          </p>
+          <ul>
+            <li data-i18n="challenge.l1">Analyzing large volumes of insurance contract data in real-time</li>
+            <li data-i18n="challenge.l2">Identifying complex fraud patterns that human reviewers might miss</li>
+            <li data-i18n="challenge.l3">Providing actionable insights through interactive dashboards</li>
+            <li data-i18n="challenge.l4">Integrating seamlessly with their existing workflow</li>
+          </ul>
+        </section>
+
+        <!-- Solution -->
+        <section class="content-section">
+          <h2><span class="icon">💡</span> <span data-i18n="solution.h">The Solution</span></h2>
+          <p data-i18n="solution.p">
+            I designed and implemented a comprehensive fraud detection ecosystem that combines machine learning, data engineering, and modern web technologies:
+          </p>
+          <ul>
+            <li data-i18n-html="solution.l1"><strong>ML Models:</strong> Built classification models using Random Forest, XGBoost, and ensemble methods to predict fraud probability with high accuracy</li>
+            <li data-i18n-html="solution.l2"><strong>ETL Pipeline:</strong> Created robust data pipelines with Talend to extract, clean, transform, and load data from multiple sources</li>
+            <li data-i18n-html="solution.l3"><strong>Power BI Dashboards:</strong> Designed interactive dashboards with DAX measures for real-time fraud monitoring and trend analysis</li>
+            <li data-i18n-html="solution.l4"><strong>Web Application:</strong> Developed a Flask backend API with ReactJS frontend for case management and fraud investigation</li>
+            <li data-i18n-html="solution.l5"><strong>Alert System:</strong> Implemented automated alerts for high-risk contracts requiring immediate review</li>
+          </ul>
+        </section>
+
+        <!-- Results -->
+        <section class="content-section">
+          <h2><span class="icon">📈</span> <span data-i18n="results.h">Results &amp; Impact</span></h2>
+          <p data-i18n="results.p">
+            The fraud detection system transformed NEOPOLIS's ability to identify and prevent insurance fraud, delivering measurable business impact:
+          </p>
+          <div class="results-grid">
+            <div class="result-card">
+              <div class="result-value">92%</div>
+              <div class="result-label" data-i18n="results.r1">Detection Accuracy</div>
+            </div>
+            <div class="result-card">
+              <div class="result-value">70%</div>
+              <div class="result-label" data-i18n="results.r2">Faster Processing</div>
+            </div>
+            <div class="result-card">
+              <div class="result-value">€50K+</div>
+              <div class="result-label" data-i18n="results.r3">Projected Savings/Year</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Key Features -->
+        <section class="content-section">
+          <h2><span class="icon">⚙️</span> <span data-i18n="features.h">Key Features</span></h2>
+          <ul>
+            <li data-i18n-html="features.l1"><strong>Real-time Scoring:</strong> Instant fraud risk assessment for new insurance applications</li>
+            <li data-i18n-html="features.l2"><strong>Pattern Recognition:</strong> ML algorithms identify hidden fraud networks and repeat offenders</li>
+            <li data-i18n-html="features.l3"><strong>Interactive Dashboards:</strong> Drill-down analytics with geographic, temporal, and category filters</li>
+            <li data-i18n-html="features.l4"><strong>Case Management:</strong> Web interface for investigators to review, annotate, and track fraud cases</li>
+            <li data-i18n-html="features.l5"><strong>Audit Trail:</strong> Complete logging of all predictions and decisions for compliance</li>
+            <li data-i18n-html="features.l6"><strong>Model Retraining:</strong> Automated pipeline to update models with new fraud patterns</li>
+          </ul>
+        </section>
+
+        <!-- CTA -->
+        <div class="project-cta">
+          <h3 data-i18n="cta.h">Need a Similar Solution?</h3>
+          <p data-i18n="cta.p">I can help you build AI-powered analytics systems to detect fraud, optimize operations, or unlock insights from your data.</p>
+          <div class="cta-buttons">
+            <a href="/#contact" class="btn btn-primary">
+              <span data-i18n="cta.btn">Let's Discuss Your Project</span>
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+            </a>
+            <a href="https://github.com" target="_blank" class="btn btn-secondary">
+              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path></svg>
+              <span data-i18n="cta.github">View on GitHub</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="content-sidebar">
+        <div class="sidebar-card">
+          <h3 data-i18n="side.info">Project Info</h3>
+          <div class="info-list">
+            <div class="info-item">
+              <span class="info-label" data-i18n="side.client">Client</span>
+              <span class="info-value">NEOPOLIS</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label" data-i18n="side.duration">Duration</span>
+              <span class="info-value" data-i18n="side.durationVal">5 months</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label" data-i18n="side.role">Role</span>
+              <span class="info-value" data-i18n="side.roleVal">BI &amp; Data Analyst</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label" data-i18n="side.type">Type</span>
+              <span class="info-value" data-i18n="side.typeVal">End-of-Studies Project</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h3 data-i18n="side.tech">Technologies Used</h3>
+          <div class="tech-list">
+            <span class="tech-item">Python</span>
+            <span class="tech-item">Scikit-learn</span>
+            <span class="tech-item">XGBoost</span>
+            <span class="tech-item">Pandas</span>
+            <span class="tech-item">Power BI</span>
+            <span class="tech-item">DAX</span>
+            <span class="tech-item">Talend</span>
+            <span class="tech-item">Flask</span>
+            <span class="tech-item">ReactJS</span>
+            <span class="tech-item">MySQL</span>
+            <span class="tech-item">REST API</span>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h3 data-i18n="side.deliverables">Deliverables</h3>
+          <div class="info-list">
+            <div class="info-item">
+              <span class="info-value" data-i18n="del.1">ML Fraud Detection Model</span>
+            </div>
+            <div class="info-item">
+              <span class="info-value" data-i18n="del.2">Talend ETL Pipeline</span>
+            </div>
+            <div class="info-item">
+              <span class="info-value" data-i18n="del.3">Power BI Dashboard</span>
+            </div>
+            <div class="info-item">
+              <span class="info-value" data-i18n="del.4">Flask + React Web App</span>
+            </div>
+            <div class="info-item">
+              <span class="info-value" data-i18n="del.5">Technical Documentation</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Project Navigation -->
+    <nav class="project-nav">
+      <div></div>
+      <a href="/project-instagram-analytics" class="nav-item next">
+        <span class="nav-label">
+          <span data-i18n="nav.next">Next Project</span>
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+        </span>
+        <span class="nav-title" data-i18n="nav.nextTitle">Instagram Analytics Platform</span>
+      </a>
+    </nav>
+  </div>
+
+  <footer>
+    <p data-i18n-html="footer">© 2024 <span class="footer-gradient">Bahri Chiraz</span>. Crafted with passion in Nabeul, Tunisia.</p>
+  </footer>
+
+  <script>
+  window.PAGE_TRANSLATIONS = {
+    en: {
+      "nav.home": "Home", "nav.allProjects": "All Projects", "nav.p1": "Fraud Detection AI", "nav.p2": "Instagram Analytics", "nav.p3": "Sales & KPI Dashboard", "nav.p4": "Social Media Analysis", "nav.p5": "GMP Mobile App", "nav.viewAll": "View All Projects",
+      "meta.date": "📅 Feb - Jun 2024", "meta.type": "🎯 End-of-Studies Project",
+      "hero.title": "Insurance <span class='gradient-text'>Fraud Detection</span> AI System",
+      "hero.intro": "Developed an AI-powered system to detect and analyze fraudulent insurance contracts, featuring machine learning models, ETL pipelines, interactive dashboards, and a full-stack web application.",
+      "gal.1": "Power BI — contracts overview dashboard (Les Affaires)", "gal.2": "Power BI — fraud analysis by user, type & status (Les Fraudes)", "gal.3": "Power BI — geographic distribution of fraud across France", "gal.4": "Data warehouse — snowflake schema (fact & dimension tables)", "gal.5": "Talend ETL — affaire ingestion job (filter, dedupe, map, load)", "gal.6": "Talend tMap — source-to-target field mapping", "gal.7": "SQL — Affaire table schema definition", "gal.8": "ML results — Random Forest classification report (97% accuracy)", "gal.9": "Python — data loading, merging & feature encoding", "gal.10": "Python — SVM training & hyperparameter tuning (GridSearchCV)",
+      "challenge.h": "The Challenge", "challenge.p": "NEOPOLIS, a leading insurance technology company, faced significant financial losses due to fraudulent insurance claims. Manual detection methods were time-consuming, inconsistent, and failed to identify sophisticated fraud patterns. They needed an intelligent system capable of:", "challenge.l1": "Analyzing large volumes of insurance contract data in real-time", "challenge.l2": "Identifying complex fraud patterns that human reviewers might miss", "challenge.l3": "Providing actionable insights through interactive dashboards", "challenge.l4": "Integrating seamlessly with their existing workflow",
+      "solution.h": "The Solution", "solution.p": "I designed and implemented a comprehensive fraud detection ecosystem that combines machine learning, data engineering, and modern web technologies:", "solution.l1": "<strong>ML Models:</strong> Built classification models using Random Forest, XGBoost, and ensemble methods to predict fraud probability with high accuracy", "solution.l2": "<strong>ETL Pipeline:</strong> Created robust data pipelines with Talend to extract, clean, transform, and load data from multiple sources", "solution.l3": "<strong>Power BI Dashboards:</strong> Designed interactive dashboards with DAX measures for real-time fraud monitoring and trend analysis", "solution.l4": "<strong>Web Application:</strong> Developed a Flask backend API with ReactJS frontend for case management and fraud investigation", "solution.l5": "<strong>Alert System:</strong> Implemented automated alerts for high-risk contracts requiring immediate review",
+      "results.h": "Results & Impact", "results.p": "The fraud detection system transformed NEOPOLIS's ability to identify and prevent insurance fraud, delivering measurable business impact:", "results.r1": "Detection Accuracy", "results.r2": "Faster Processing", "results.r3": "Projected Savings/Year",
+      "features.h": "Key Features", "features.l1": "<strong>Real-time Scoring:</strong> Instant fraud risk assessment for new insurance applications", "features.l2": "<strong>Pattern Recognition:</strong> ML algorithms identify hidden fraud networks and repeat offenders", "features.l3": "<strong>Interactive Dashboards:</strong> Drill-down analytics with geographic, temporal, and category filters", "features.l4": "<strong>Case Management:</strong> Web interface for investigators to review, annotate, and track fraud cases", "features.l5": "<strong>Audit Trail:</strong> Complete logging of all predictions and decisions for compliance", "features.l6": "<strong>Model Retraining:</strong> Automated pipeline to update models with new fraud patterns",
+      "cta.h": "Need a Similar Solution?", "cta.p": "I can help you build AI-powered analytics systems to detect fraud, optimize operations, or unlock insights from your data.", "cta.btn": "Let's Discuss Your Project", "cta.github": "View on GitHub",
+      "side.info": "Project Info", "side.client": "Client", "side.duration": "Duration", "side.durationVal": "5 months", "side.role": "Role", "side.roleVal": "BI & Data Analyst", "side.type": "Type", "side.typeVal": "End-of-Studies Project", "side.tech": "Technologies Used", "side.deliverables": "Deliverables",
+      "del.1": "ML Fraud Detection Model", "del.2": "Talend ETL Pipeline", "del.3": "Power BI Dashboard", "del.4": "Flask + React Web App", "del.5": "Technical Documentation",
+      "nav.next": "Next Project", "nav.nextTitle": "Instagram Analytics Platform",
+      "footer": "© 2024 <span class='footer-gradient'>Bahri Chiraz</span>. Crafted with passion in Nabeul, Tunisia."
+    },
+    fr: {
+      "nav.home": "Accueil", "nav.allProjects": "Tous les projets", "nav.p1": "IA de détection de fraude", "nav.p2": "Analyse Instagram", "nav.p3": "Tableau de bord ventes & KPI", "nav.p4": "Analyse des réseaux sociaux", "nav.p5": "Application mobile GMP", "nav.viewAll": "Voir tous les projets",
+      "meta.date": "📅 Fév - Juin 2024", "meta.type": "🎯 Projet de fin d'études",
+      "hero.title": "Système IA de <span class='gradient-text'>détection de fraude</span> en assurance",
+      "hero.intro": "Développement d'un système basé sur l'IA pour détecter et analyser les contrats d'assurance frauduleux, avec des modèles de machine learning, des pipelines ETL, des tableaux de bord interactifs et une application web full-stack.",
+      "gal.1": "Power BI — tableau de bord des contrats (Les Affaires)", "gal.2": "Power BI — analyse des fraudes par utilisateur, type et statut (Les Fraudes)", "gal.3": "Power BI — répartition géographique des fraudes en France", "gal.4": "Entrepôt de données — schéma en flocon (tables de faits et de dimensions)", "gal.5": "Talend ETL — job d'ingestion des affaires (filtrer, dédupliquer, mapper, charger)", "gal.6": "Talend tMap — mappage des champs source vers cible", "gal.7": "SQL — définition du schéma de la table Affaire", "gal.8": "Résultats ML — rapport de classification Random Forest (97% de précision)", "gal.9": "Python — chargement, fusion et encodage des données", "gal.10": "Python — entraînement SVM et réglage des hyperparamètres (GridSearchCV)",
+      "challenge.h": "Le défi", "challenge.p": "NEOPOLIS, une entreprise leader en technologie d'assurance, subissait d'importantes pertes financières dues aux fausses déclarations d'assurance. Les méthodes de détection manuelles étaient longues, incohérentes et ne parvenaient pas à identifier les schémas de fraude sophistiqués. Elle avait besoin d'un système intelligent capable de :", "challenge.l1": "Analyser de grands volumes de données de contrats d'assurance en temps réel", "challenge.l2": "Identifier des schémas de fraude complexes que les analystes humains pourraient manquer", "challenge.l3": "Fournir des informations exploitables via des tableaux de bord interactifs", "challenge.l4": "S'intégrer parfaitement à leur flux de travail existant",
+      "solution.h": "La solution", "solution.p": "J'ai conçu et mis en œuvre un écosystème complet de détection de fraude combinant machine learning, ingénierie des données et technologies web modernes :", "solution.l1": "<strong>Modèles ML :</strong> Modèles de classification avec Random Forest, XGBoost et méthodes d'ensemble pour prédire la probabilité de fraude avec une grande précision", "solution.l2": "<strong>Pipeline ETL :</strong> Pipelines de données robustes avec Talend pour extraire, nettoyer, transformer et charger les données de sources multiples", "solution.l3": "<strong>Tableaux de bord Power BI :</strong> Tableaux interactifs avec mesures DAX pour le suivi des fraudes en temps réel et l'analyse des tendances", "solution.l4": "<strong>Application web :</strong> API backend Flask avec interface ReactJS pour la gestion des dossiers et l'investigation des fraudes", "solution.l5": "<strong>Système d'alerte :</strong> Alertes automatiques pour les contrats à haut risque nécessitant un examen immédiat",
+      "results.h": "Résultats & impact", "results.p": "Le système de détection de fraude a transformé la capacité de NEOPOLIS à identifier et prévenir la fraude à l'assurance, avec un impact mesurable :", "results.r1": "Précision de détection", "results.r2": "Traitement plus rapide", "results.r3": "Économies projetées/an",
+      "features.h": "Fonctionnalités clés", "features.l1": "<strong>Scoring en temps réel :</strong> Évaluation instantanée du risque de fraude pour les nouvelles demandes d'assurance", "features.l2": "<strong>Reconnaissance de schémas :</strong> Les algorithmes ML identifient les réseaux de fraude cachés et les récidivistes", "features.l3": "<strong>Tableaux interactifs :</strong> Analyses détaillées avec filtres géographiques, temporels et par catégorie", "features.l4": "<strong>Gestion des dossiers :</strong> Interface web permettant aux enquêteurs d'examiner, annoter et suivre les cas de fraude", "features.l5": "<strong>Piste d'audit :</strong> Journalisation complète de toutes les prédictions et décisions pour la conformité", "features.l6": "<strong>Réentraînement des modèles :</strong> Pipeline automatisé pour mettre à jour les modèles avec les nouveaux schémas de fraude",
+      "cta.h": "Besoin d'une solution similaire ?", "cta.p": "Je peux vous aider à concevoir des systèmes d'analyse basés sur l'IA pour détecter la fraude, optimiser les opérations ou exploiter vos données.", "cta.btn": "Discutons de votre projet", "cta.github": "Voir sur GitHub",
+      "side.info": "Infos du projet", "side.client": "Client", "side.duration": "Durée", "side.durationVal": "5 mois", "side.role": "Rôle", "side.roleVal": "Analyste BI & Données", "side.type": "Type", "side.typeVal": "Projet de fin d'études", "side.tech": "Technologies utilisées", "side.deliverables": "Livrables",
+      "del.1": "Modèle ML de détection de fraude", "del.2": "Pipeline ETL Talend", "del.3": "Tableau de bord Power BI", "del.4": "Application web Flask + React", "del.5": "Documentation technique",
+      "nav.next": "Projet suivant", "nav.nextTitle": "Plateforme d'analyse Instagram",
+      "footer": "© 2024 <span class='footer-gradient'>Bahri Chiraz</span>. Réalisé avec passion à Nabeul, Tunisie."
+    },
+    ar: {
+      "nav.home": "الرئيسية", "nav.allProjects": "كل المشاريع", "nav.p1": "ذكاء كشف الاحتيال", "nav.p2": "تحليلات إنستغرام", "nav.p3": "لوحة المبيعات و KPI", "nav.p4": "تحليل وسائل التواصل", "nav.p5": "تطبيق GMP الجوال", "nav.viewAll": "عرض كل المشاريع",
+      "meta.date": "📅 فبراير - يونيو 2024", "meta.type": "🎯 مشروع تخرج",
+      "hero.title": "نظام ذكاء اصطناعي <span class='gradient-text'>لكشف الاحتيال</span> في التأمين",
+      "hero.intro": "تطوير نظام مدعوم بالذكاء الاصطناعي للكشف عن عقود التأمين الاحتيالية وتحليلها، يضم نماذج تعلم آلي وخطوط ETL ولوحات تفاعلية وتطبيق ويب متكامل.",
+      "gal.1": "Power BI — لوحة نظرة عامة على العقود (Les Affaires)", "gal.2": "Power BI — تحليل الاحتيال حسب المستخدم والنوع والحالة (Les Fraudes)", "gal.3": "Power BI — التوزيع الجغرافي للاحتيال عبر فرنسا", "gal.4": "مستودع البيانات — مخطط ندفة الثلج (جداول الحقائق والأبعاد)", "gal.5": "Talend ETL — مهمة استيعاب البيانات (تصفية، إزالة تكرار، تعيين، تحميل)", "gal.6": "Talend tMap — تعيين الحقول من المصدر إلى الهدف", "gal.7": "SQL — تعريف مخطط جدول Affaire", "gal.8": "نتائج التعلم الآلي — تقرير تصنيف Random Forest (دقة 97%)", "gal.9": "Python — تحميل البيانات ودمجها وترميز الخصائص", "gal.10": "Python — تدريب SVM وضبط المعلمات الفائقة (GridSearchCV)",
+      "challenge.h": "التحدي", "challenge.p": "واجهت NEOPOLIS، إحدى الشركات الرائدة في تكنولوجيا التأمين، خسائر مالية كبيرة بسبب مطالبات التأمين الاحتيالية. كانت طرق الكشف اليدوية بطيئة وغير متسقة وتفشل في رصد أنماط الاحتيال المعقدة. لقد احتاجوا إلى نظام ذكي قادر على:", "challenge.l1": "تحليل كميات كبيرة من بيانات عقود التأمين في الوقت الفعلي", "challenge.l2": "رصد أنماط الاحتيال المعقدة التي قد يغفل عنها المراجعون", "challenge.l3": "تقديم رؤى قابلة للتنفيذ عبر لوحات تفاعلية", "challenge.l4": "التكامل بسلاسة مع سير العمل الحالي",
+      "solution.h": "الحل", "solution.p": "قمت بتصميم وتنفيذ منظومة متكاملة لكشف الاحتيال تجمع بين التعلم الآلي وهندسة البيانات وتقنيات الويب الحديثة:", "solution.l1": "<strong>نماذج تعلم آلي:</strong> بناء نماذج تصنيف باستخدام Random Forest و XGBoost والطرق المجمّعة للتنبؤ باحتمالية الاحتيال بدقة عالية", "solution.l2": "<strong>خط ETL:</strong> إنشاء خطوط بيانات قوية باستخدام Talend لاستخراج البيانات وتنظيفها وتحويلها وتحميلها من مصادر متعددة", "solution.l3": "<strong>لوحات Power BI:</strong> تصميم لوحات تفاعلية مع مقاييس DAX لمراقبة الاحتيال وتحليل الاتجاهات في الوقت الفعلي", "solution.l4": "<strong>تطبيق ويب:</strong> تطوير واجهة برمجية خلفية بـ Flask مع واجهة أمامية ReactJS لإدارة الحالات والتحقيق في الاحتيال", "solution.l5": "<strong>نظام تنبيهات:</strong> تنبيهات آلية للعقود عالية الخطورة التي تتطلب مراجعة فورية",
+      "results.h": "النتائج والأثر", "results.p": "حوّل نظام كشف الاحتيال قدرة NEOPOLIS على رصد ومنع الاحتيال في التأمين، محققاً أثراً تجارياً ملموساً:", "results.r1": "دقة الكشف", "results.r2": "معالجة أسرع", "results.r3": "توفير متوقع سنوياً",
+      "features.h": "الميزات الرئيسية", "features.l1": "<strong>تقييم فوري:</strong> تقييم لحظي لمخاطر الاحتيال لطلبات التأمين الجديدة", "features.l2": "<strong>التعرف على الأنماط:</strong> تحدد خوارزميات التعلم الآلي شبكات الاحتيال الخفية والمخالفين المتكررين", "features.l3": "<strong>لوحات تفاعلية:</strong> تحليلات تفصيلية مع مرشحات جغرافية وزمنية وحسب الفئة", "features.l4": "<strong>إدارة الحالات:</strong> واجهة ويب للمحققين لمراجعة حالات الاحتيال والتعليق عليها وتتبعها", "features.l5": "<strong>سجل تدقيق:</strong> تسجيل كامل لجميع التنبؤات والقرارات لأغراض الامتثال", "features.l6": "<strong>إعادة تدريب النماذج:</strong> خط آلي لتحديث النماذج بأنماط الاحتيال الجديدة",
+      "cta.h": "تحتاج حلاً مماثلاً؟", "cta.p": "يمكنني مساعدتك في بناء أنظمة تحليلية مدعومة بالذكاء الاصطناعي لكشف الاحتيال أو تحسين العمليات أو استخلاص الرؤى من بياناتك.", "cta.btn": "لنناقش مشروعك", "cta.github": "عرض على GitHub",
+      "side.info": "معلومات المشروع", "side.client": "العميل", "side.duration": "المدة", "side.durationVal": "5 أشهر", "side.role": "الدور", "side.roleVal": "محلل بيانات و ذكاء أعمال", "side.type": "النوع", "side.typeVal": "مشروع تخرج", "side.tech": "التقنيات المستخدمة", "side.deliverables": "المخرجات",
+      "del.1": "نموذج تعلم آلي لكشف الاحتيال", "del.2": "خط ETL بـ Talend", "del.3": "لوحة Power BI", "del.4": "تطبيق ويب Flask + React", "del.5": "وثائق تقنية",
+      "nav.next": "المشروع التالي", "nav.nextTitle": "منصة تحليلات إنستغرام",
+      "footer": "© 2024 <span class='footer-gradient'>Bahri Chiraz</span>. صُنع بشغف في نابل، تونس."
+    }
+  };
+  </script>
+  <script src="/js/i18n-project.js"></script>
+
+</body></html>

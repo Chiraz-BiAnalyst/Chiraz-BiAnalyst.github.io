@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram Analytics Platform | Bahri Chiraz</title>
+  <meta name="description" content="Performance analysis and predictive modeling for Instagram advertising optimization - Case study by Bahri Chiraz">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;rect fill='%23a855f7' rx='20' width='100' height='100'/&gt;&lt;text x='50' y='62' font-size='45' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'&gt;BC&lt;/text&gt;&lt;/svg&gt;">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Outfit:wght@300;400;500;600;700;800&amp;family=Noto+Sans+Arabic:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-primary: #030014;
+      --bg-secondary: #0a0a1f;
+      --accent-purple: #a855f7;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --neon-purple: #c084fc;
+      --neon-blue: #60a5fa;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.6);
+      --text-muted: rgba(255, 255, 255, 0.4);
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-hover: rgba(255, 255, 255, 0.06);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--accent-purple), var(--accent-blue)); border-radius: 4px; }
+    .gradient-orbs { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: orbFloat 20s ease-in-out infinite; }
+    .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%); top: -150px; right: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%); bottom: -100px; left: -100px; animation-delay: -10s; }
+    @keyframes orbFloat { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(30px, -30px) scale(1.05); } }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 1.25rem 3rem; display: flex; justify-content: space-between; align-items: center; background: rgba(3, 0, 20, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); }
+    .logo { font-family: 'Outfit', sans-serif; font-size: 1.75rem; font-weight: 800; background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .back-link { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+    .back-link:hover { color: var(--accent-purple); gap: 0.75rem; }
+    .back-link svg { width: 20px; height: 20px; }
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
+    .nav-dropdown-btn:hover { color: var(--accent-purple); border-color: var(--accent-purple); }
+    .nav-dropdown-btn svg { width: 16px; height: 16px; transition: transform 0.3s ease; }
+    .nav-dropdown:hover .nav-dropdown-btn svg { transform: rotate(180deg); }
+    .nav-dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 0.5rem; min-width: 260px; background: rgba(10, 10, 31, 0.95); border: 1px solid var(--glass-border); border-radius: 12px; padding: 0.5rem; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; backdrop-filter: blur(20px); }
+    .nav-dropdown:hover .nav-dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+    .nav-dropdown-menu a { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s ease; }
+    .nav-dropdown-menu a:hover { background: var(--glass-hover); color: var(--text-primary); }
+    .nav-dropdown-menu a.active { background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1)); color: var(--neon-purple); }
+    .nav-dropdown-menu a svg { width: 18px; height: 18px; opacity: 0.6; }
+    .nav-dropdown-divider { height: 1px; background: var(--glass-border); margin: 0.5rem 0; }
+    .project-hero { padding: 10rem 3rem 5rem; position: relative; }
+    .project-hero-content { max-width: 1200px; margin: 0 auto; }
+    .project-meta { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .project-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 100px; font-size: 0.85rem; color: var(--text-secondary); }
+    .project-badge.company { background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.1)); border-color: var(--accent-purple); color: var(--neon-purple); }
+    .project-hero h1 { font-family: 'Outfit', sans-serif; font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -0.03em; }
+    .project-hero h1 .gradient-text { background: linear-gradient(135deg, var(--neon-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .project-intro { font-size: 1.25rem; color: var(--text-secondary); max-width: 700px; line-height: 1.7; margin-bottom: 2rem; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .project-tag { padding: 0.5rem 1rem; background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1)); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 100px; font-size: 0.9rem; font-weight: 500; color: var(--neon-purple); }
+    .project-gallery { padding: 0 3rem 5rem; }
+    .gallery-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+    .gallery-main { grid-row: span 2; border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
+    .gallery-main img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-thumb { border-radius: 16px; overflow: hidden; border: 1px solid var(--glass-border); transition: all 0.3s ease; }
+    .gallery-thumb:hover { border-color: var(--accent-purple); transform: scale(1.02); }
+    .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .project-content { max-width: 1200px; margin: 0 auto; padding: 0 3rem; }
+    .content-grid { display: grid; grid-template-columns: 1fr 350px; gap: 4rem; }
+    .content-main { display: flex; flex-direction: column; gap: 4rem; }
+    .content-section h2 { font-family: 'Outfit', sans-serif; font-size: 1.75rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.75rem; }
+    .content-section h2 .icon { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.2)); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+    .content-section p { color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 1rem; }
+    .content-section ul { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+    .content-section li { color: var(--text-secondary); font-size: 1rem; padding-left: 1.75rem; position: relative; line-height: 1.7; }
+    .content-section li::before { content: '→'; position: absolute; left: 0; color: var(--accent-purple); font-weight: 600; }
+    .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1.5rem; }
+    .result-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; text-align: center; transition: all 0.3s ease; }
+    .result-card:hover { border-color: var(--accent-purple); transform: translateY(-5px); }
+    .result-value { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--neon-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.25rem; }
+    .result-label { color: var(--text-secondary); font-size: 0.9rem; }
+    .content-sidebar { display: flex; flex-direction: column; gap: 2rem; }
+    .sidebar-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 1.75rem; }
+    .sidebar-card h3 { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--text-primary); }
+    .info-list { display: flex; flex-direction: column; gap: 1rem; }
+    .info-item { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; border-bottom: 1px solid var(--glass-border); }
+    .info-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .info-label { color: var(--text-muted); font-size: 0.9rem; }
+    .info-value { color: var(--text-primary); font-weight: 600; font-size: 0.95rem; }
+    .tech-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tech-item { padding: 0.4rem 0.85rem; background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1)); border-radius: 100px; font-size: 0.8rem; font-weight: 500; color: var(--neon-purple); }
+    .project-cta { margin-top: 5rem; padding: 4rem; background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.05)); border: 1px solid var(--glass-border); border-radius: 24px; text-align: center; }
+    .project-cta h3 { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+    .project-cta p { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 2rem; border-radius: 12px; font-size: 1rem; font-weight: 600; text-decoration: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; border: none; font-family: inherit; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); color: white; box-shadow: 0 0 30px rgba(168, 85, 247, 0.4); }
+    .btn-primary:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 0 50px rgba(168, 85, 247, 0.6); }
+    .btn-secondary { background: var(--glass-bg); color: var(--text-primary); border: 1px solid var(--glass-border); }
+    .btn-secondary:hover { background: var(--glass-hover); transform: translateY(-4px); border-color: var(--accent-purple); }
+    .project-nav { max-width: 1200px; margin: 5rem auto 0; padding: 3rem; display: flex; justify-content: space-between; border-top: 1px solid var(--glass-border); }
+    .nav-item { display: flex; flex-direction: column; gap: 0.5rem; text-decoration: none; transition: all 0.3s ease; }
+    .nav-item:hover { transform: translateX(10px); }
+    .nav-item.prev:hover { transform: translateX(-10px); }
+    .nav-item.next { text-align: right; align-items: flex-end; }
+    .nav-label { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 0.5rem; }
+    .nav-title { color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700; }
+    .nav-item:hover .nav-title { color: var(--accent-purple); }
+    footer { padding: 3rem; text-align: center; border-top: 1px solid var(--glass-border); margin-top: 3rem; }
+    footer p { color: var(--text-muted); font-size: 0.9rem; }
+    footer .footer-gradient { background: linear-gradient(90deg, var(--neon-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 600; }
+    @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } .content-sidebar { flex-direction: row; flex-wrap: wrap; } .sidebar-card { flex: 1; min-width: 280px; } .gallery-grid { grid-template-columns: 1fr; } .gallery-main { grid-row: auto; } }
+    @media (max-width: 768px) { nav { padding: 1rem 1.5rem; } .project-hero { padding: 8rem 1.5rem 3rem; } .project-gallery { padding: 0 1.5rem 3rem; } .project-content { padding: 0 1.5rem; } .results-grid { grid-template-columns: 1fr; } .project-cta { padding: 2rem; margin-top: 3rem; } .project-nav { flex-direction: column; gap: 2rem; padding: 2rem 1.5rem; } .nav-item.next { text-align: left; align-items: flex-start; } .nav-item:hover, .nav-item.prev:hover { transform: none; } }
+    @media (max-width: 480px) { nav { padding: 0.85rem 1rem; } .nav-links { gap: 0.5rem; } .back-link span { display: none; } .nav-dropdown-btn { padding: 0.45rem 0.7rem; font-size: 0.8rem; } .nav-dropdown-menu { min-width: 210px; } .lang-switcher { gap: 0.25rem; } .lang-btn { padding: 0.3rem 0.5rem; font-size: 0.72rem; } .project-hero { padding: 7rem 1.1rem 2.5rem; } .project-gallery { padding: 0 1.1rem 2.5rem; } .project-content { padding: 0 1.1rem; } .project-intro { font-size: 1.05rem; } .project-cta { padding: 1.75rem 1.25rem; } .project-cta h3 { font-size: 1.5rem; } .cta-buttons { flex-direction: column; } .cta-buttons .btn { width: 100%; justify-content: center; } .content-section h2 { font-size: 1.4rem; } .result-value { font-size: 2rem; } }
+    .fade-in { opacity: 0; transform: translateY(30px); animation: fadeIn 0.8s ease forwards; }
+    .fade-in-delay-1 { animation-delay: 0.1s; } .fade-in-delay-2 { animation-delay: 0.2s; } .fade-in-delay-3 { animation-delay: 0.3s; } .fade-in-delay-4 { animation-delay: 0.4s; }
+    @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+    .lang-switcher { display: flex; gap: 0.4rem; align-items: center; }
+    .lang-btn { padding: 0.35rem 0.7rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-secondary); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
+    .lang-btn:hover, .lang-btn.active { background: var(--accent-purple); border-color: var(--accent-purple); color: white; }
+    [dir="rtl"] body { font-family: 'Noto Sans Arabic', 'Space Grotesk', sans-serif; }
+    [dir="rtl"] .back-link svg, [dir="rtl"] .nav-item svg, [dir="rtl"] .project-cta .btn svg { transform: scaleX(-1); }
+  </style>
+<script src="https://cdn.moda.app/runtime-libs/tailwind-browser-4.1.13-index.global.min.js"></script><style data-moda-export-fonts="true">@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--thin.ttf") format("truetype"); font-style: normal; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--extralight.ttf") format("truetype"); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--extrabold.ttf") format("truetype"); font-style: normal; font-weight: 800; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--black.ttf") format("truetype"); font-style: normal; font-weight: 900; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--thin.ttf") format("truetype"); font-style: normal; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--extralight.ttf") format("truetype"); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--extrabold.ttf") format("truetype"); font-style: normal; font-weight: 800; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--black.ttf") format("truetype"); font-style: normal; font-weight: 900; font-display: swap; }</style></head>
+<body>
+  <div class="gradient-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+
+  <nav>
+    <a href="/" class="logo">BC</a>
+    <div class="nav-links">
+      <a href="/" class="back-link">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+        <span data-i18n="nav.home">Home</span>
+      </a>
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-btn">
+          <span data-i18n="nav.allProjects">All Projects</span>
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/project-fraud-detection">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            <span data-i18n="nav.p1">Fraud Detection AI</span>
+          </a>
+          <a href="/project-instagram-analytics" class="active">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            <span data-i18n="nav.p2">Instagram Analytics</span>
+          </a>
+          <a href="/project-sales-dashboard">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <span data-i18n="nav.p3">Sales &amp; KPI Dashboard</span>
+          </a>
+          <a href="/project-social-media">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+            <span data-i18n="nav.p4">Social Media Analysis</span>
+          </a>
+          <a href="/project-gmp-app">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+            <span data-i18n="nav.p5">GMP Mobile App</span>
+          </a>
+          <div class="nav-dropdown-divider"></div>
+          <a href="/#projects">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+            <span data-i18n="nav.viewAll">View All Projects</span>
+          </a>
+        </div>
+      </div>
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="fr">FR</button>
+        <button class="lang-btn" data-lang="ar">عربي</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="project-hero">
+    <div class="project-hero-content">
+      <div class="project-meta fade-in">
+        <span class="project-badge company" data-i18n="meta.company">Freelance</span>
+        <span class="project-badge" data-i18n="meta.date">📅 Oct 2024 - Present</span>
+        <span class="project-badge" data-i18n="meta.status">📊 Ongoing Project</span>
+      </div>
+      <h1 class="fade-in fade-in-delay-1" data-i18n-html="hero.title">
+        Instagram <span class="gradient-text">Analytics</span> Platform
+      </h1>
+      <p class="project-intro fade-in fade-in-delay-2" data-i18n="hero.intro">
+        Performance analysis and predictive modeling platform for optimizing Instagram advertising budgets, featuring automated data pipelines, ML-powered insights, and interactive dashboards.
+      </p>
+      <div class="project-tags fade-in fade-in-delay-3">
+        <span class="project-tag">Power BI</span>
+        <span class="project-tag">Python</span>
+        <span class="project-tag">Talend ETL</span>
+        <span class="project-tag">DAX</span>
+        <span class="project-tag">Machine Learning</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="project-gallery fade-in fade-in-delay-4">
+    <div class="gallery-grid">
+      <div class="gallery-main">
+        <img src="../../images/8f79fba4-af5e-4e51-9632-a28d33f1054f.png" alt="Instagram Analytics Dashboard">
+      </div>
+      <div class="gallery-thumb">
+        <img src="../../images/2eb2d38d-860d-4027-8158-9637b429b25a.png" alt="Python Analysis Code">
+      </div>
+      <div class="gallery-thumb">
+        <img src="../../images/c526d144-9654-430e-ac1f-f80c08329c6f.png" alt="Talend ETL Pipeline">
+      </div>
+    </div>
+  </section>
+
+  <div class="project-content">
+    <div class="content-grid">
+      <div class="content-main">
+        
+        <section class="content-section">
+          <h2><span class="icon">🎯</span> <span data-i18n="challenge.h">The Challenge</span></h2>
+          <p data-i18n="challenge.p">
+            A growing e-commerce business was spending significant budget on Instagram advertising but lacked visibility into which campaigns, content types, and posting times delivered the best ROI. They needed:
+          </p>
+          <ul>
+            <li data-i18n="challenge.l1">Consolidated view of Instagram performance metrics across multiple accounts</li>
+            <li data-i18n="challenge.l2">Predictive insights to optimize future ad spending</li>
+            <li data-i18n="challenge.l3">Automated reporting to save hours of manual analysis weekly</li>
+            <li data-i18n="challenge.l4">Actionable recommendations for content strategy</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2><span class="icon">💡</span> <span data-i18n="solution.h">The Solution</span></h2>
+          <p data-i18n="solution.p">
+            I built an end-to-end analytics platform that transforms raw Instagram data into strategic insights:
+          </p>
+          <ul>
+            <li data-i18n-html="solution.l1"><strong>Automated ETL:</strong> Talend pipelines extract data from Instagram API daily, clean and transform it, then load into a centralized data warehouse</li>
+            <li data-i18n-html="solution.l2"><strong>Predictive Models:</strong> Python ML models forecast engagement rates and optimal posting times based on historical patterns</li>
+            <li data-i18n-html="solution.l3"><strong>Interactive Dashboard:</strong> Power BI reports with drill-through capabilities for campaign, content, and audience analysis</li>
+            <li data-i18n-html="solution.l4"><strong>Budget Optimizer:</strong> Algorithm that recommends budget allocation across campaigns based on predicted performance</li>
+            <li data-i18n-html="solution.l5"><strong>Automated Alerts:</strong> Notifications when metrics deviate from expected ranges</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2><span class="icon">📈</span> <span data-i18n="results.h">Results &amp; Impact</span></h2>
+          <p data-i18n="results.p">
+            The platform has transformed how the client approaches Instagram marketing:
+          </p>
+          <div class="results-grid">
+            <div class="result-card">
+              <div class="result-value">35%</div>
+              <div class="result-label" data-i18n="results.r1">Higher Engagement</div>
+            </div>
+            <div class="result-card">
+              <div class="result-value">25%</div>
+              <div class="result-label" data-i18n="results.r2">Better Ad ROI</div>
+            </div>
+            <div class="result-card">
+              <div class="result-value">8hrs</div>
+              <div class="result-label" data-i18n="results.r3">Saved Weekly</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2><span class="icon">⚙️</span> <span data-i18n="features.h">Key Features</span></h2>
+          <ul>
+            <li data-i18n-html="features.l1"><strong>Multi-Account Dashboard:</strong> Unified view across multiple Instagram business accounts</li>
+            <li data-i18n-html="features.l2"><strong>Content Performance Matrix:</strong> Visual analysis of which content types perform best</li>
+            <li data-i18n-html="features.l3"><strong>Optimal Posting Times:</strong> ML-powered recommendations for when to post</li>
+            <li data-i18n-html="features.l4"><strong>Competitor Benchmarking:</strong> Compare metrics against industry averages</li>
+            <li data-i18n-html="features.l5"><strong>Hashtag Analytics:</strong> Track which hashtags drive the most engagement</li>
+            <li data-i18n-html="features.l6"><strong>Automated Weekly Reports:</strong> Scheduled email reports to stakeholders</li>
+          </ul>
+        </section>
+
+        <div class="project-cta">
+          <h3 data-i18n="cta.h">Want Better Social Media ROI?</h3>
+          <p data-i18n="cta.p">I can build custom analytics platforms to optimize your social media advertising and content strategy.</p>
+          <div class="cta-buttons">
+            <a href="/#contact" class="btn btn-primary">
+              <span data-i18n="cta.btn">Let's Discuss Your Project</span>
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <aside class="content-sidebar">
+        <div class="sidebar-card">
+          <h3 data-i18n="side.info">Project Info</h3>
+          <div class="info-list">
+            <div class="info-item">
+              <span class="info-label" data-i18n="side.client">Client</span>
+              <span class="info-value" data-i18n="side.clientVal">E-Commerce Brand</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label" data-i18n="side.duration">Duration</span>
+              <span class="info-value" data-i18n="side.durationVal">Ongoing</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label" data-i18n="side.role">Role</span>
+              <span class="info-value" data-i18n="side.roleVal">BI &amp; Data Analyst</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label" data-i18n="side.type">Type</span>
+              <span class="info-value" data-i18n="side.typeVal">Freelance</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h3 data-i18n="side.tech">Technologies Used</h3>
+          <div class="tech-list">
+            <span class="tech-item">Power BI</span>
+            <span class="tech-item">DAX</span>
+            <span class="tech-item">Power Query</span>
+            <span class="tech-item">Python</span>
+            <span class="tech-item">Pandas</span>
+            <span class="tech-item">Scikit-learn</span>
+            <span class="tech-item">Talend</span>
+            <span class="tech-item">Instagram API</span>
+            <span class="tech-item">PostgreSQL</span>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h3 data-i18n="side.deliverables">Deliverables</h3>
+          <div class="info-list">
+            <div class="info-item"><span class="info-value" data-i18n="del.1">Power BI Dashboard</span></div>
+            <div class="info-item"><span class="info-value" data-i18n="del.2">Talend ETL Pipeline</span></div>
+            <div class="info-item"><span class="info-value" data-i18n="del.3">Python ML Models</span></div>
+            <div class="info-item"><span class="info-value" data-i18n="del.4">Automated Reports</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <nav class="project-nav">
+      <a href="/project-fraud-detection" class="nav-item prev">
+        <span class="nav-label">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+          <span data-i18n="nav.prev">Previous Project</span>
+        </span>
+        <span class="nav-title" data-i18n="nav.prevTitle">Insurance Fraud Detection AI</span>
+      </a>
+      <a href="/project-sales-dashboard" class="nav-item next">
+        <span class="nav-label">
+          <span data-i18n="nav.next">Next Project</span>
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+        </span>
+        <span class="nav-title" data-i18n="nav.nextTitle">Sales &amp; KPI Dashboard</span>
+      </a>
+    </nav>
+  </div>
+
+  <footer>
+    <p data-i18n-html="footer">© 2024 <span class="footer-gradient">Bahri Chiraz</span>. Crafted with passion in Nabeul, Tunisia.</p>
+  </footer>
+
+  <script>
+  window.PAGE_TRANSLATIONS = {
+    en: {
+      "nav.home": "Home", "nav.allProjects": "All Projects", "nav.p1": "Fraud Detection AI", "nav.p2": "Instagram Analytics", "nav.p3": "Sales & KPI Dashboard", "nav.p4": "Social Media Analysis", "nav.p5": "GMP Mobile App", "nav.viewAll": "View All Projects",
+      "meta.company": "Freelance", "meta.date": "📅 Oct 2024 - Present", "meta.status": "📊 Ongoing Project",
+      "hero.title": "Instagram <span class='gradient-text'>Analytics</span> Platform",
+      "hero.intro": "Performance analysis and predictive modeling platform for optimizing Instagram advertising budgets, featuring automated data pipelines, ML-powered insights, and interactive dashboards.",
+      "challenge.h": "The Challenge", "challenge.p": "A growing e-commerce business was spending significant budget on Instagram advertising but lacked visibility into which campaigns, content types, and posting times delivered the best ROI. They needed:", "challenge.l1": "Consolidated view of Instagram performance metrics across multiple accounts", "challenge.l2": "Predictive insights to optimize future ad spending", "challenge.l3": "Automated reporting to save hours of manual analysis weekly", "challenge.l4": "Actionable recommendations for content strategy",
+      "solution.h": "The Solution", "solution.p": "I built an end-to-end analytics platform that transforms raw Instagram data into strategic insights:", "solution.l1": "<strong>Automated ETL:</strong> Talend pipelines extract data from Instagram API daily, clean and transform it, then load into a centralized data warehouse", "solution.l2": "<strong>Predictive Models:</strong> Python ML models forecast engagement rates and optimal posting times based on historical patterns", "solution.l3": "<strong>Interactive Dashboard:</strong> Power BI reports with drill-through capabilities for campaign, content, and audience analysis", "solution.l4": "<strong>Budget Optimizer:</strong> Algorithm that recommends budget allocation across campaigns based on predicted performance", "solution.l5": "<strong>Automated Alerts:</strong> Notifications when metrics deviate from expected ranges",
+      "results.h": "Results & Impact", "results.p": "The platform has transformed how the client approaches Instagram marketing:", "results.r1": "Higher Engagement", "results.r2": "Better Ad ROI", "results.r3": "Saved Weekly",
+      "features.h": "Key Features", "features.l1": "<strong>Multi-Account Dashboard:</strong> Unified view across multiple Instagram business accounts", "features.l2": "<strong>Content Performance Matrix:</strong> Visual analysis of which content types perform best", "features.l3": "<strong>Optimal Posting Times:</strong> ML-powered recommendations for when to post", "features.l4": "<strong>Competitor Benchmarking:</strong> Compare metrics against industry averages", "features.l5": "<strong>Hashtag Analytics:</strong> Track which hashtags drive the most engagement", "features.l6": "<strong>Automated Weekly Reports:</strong> Scheduled email reports to stakeholders",
+      "cta.h": "Want Better Social Media ROI?", "cta.p": "I can build custom analytics platforms to optimize your social media advertising and content strategy.", "cta.btn": "Let's Discuss Your Project",
+      "side.info": "Project Info", "side.client": "Client", "side.clientVal": "E-Commerce Brand", "side.duration": "Duration", "side.durationVal": "Ongoing", "side.role": "Role", "side.roleVal": "BI & Data Analyst", "side.type": "Type", "side.typeVal": "Freelance", "side.tech": "Technologies Used", "side.deliverables": "Deliverables",
+      "del.1": "Power BI Dashboard", "del.2": "Talend ETL Pipeline", "del.3": "Python ML Models", "del.4": "Automated Reports",
+      "nav.prev": "Previous Project", "nav.prevTitle": "Insurance Fraud Detection AI", "nav.next": "Next Project", "nav.nextTitle": "Sales & KPI Dashboard",
+      "footer": "© 2024 <span class='footer-gradient'>Bahri Chiraz</span>. Crafted with passion in Nabeul, Tunisia."
+    },
+    fr: {
+      "nav.home": "Accueil", "nav.allProjects": "Tous les projets", "nav.p1": "IA de détection de fraude", "nav.p2": "Analyse Instagram", "nav.p3": "Tableau de bord ventes & KPI", "nav.p4": "Analyse des réseaux sociaux", "nav.p5": "Application mobile GMP", "nav.viewAll": "Voir tous les projets",
+      "meta.company": "Freelance", "meta.date": "📅 Oct 2024 - Présent", "meta.status": "📊 Projet en cours",
+      "hero.title": "Plateforme d'<span class='gradient-text'>analyse</span> Instagram",
+      "hero.intro": "Plateforme d'analyse de performance et de modélisation prédictive pour optimiser les budgets publicitaires Instagram, avec des pipelines de données automatisés, des analyses basées sur le ML et des tableaux de bord interactifs.",
+      "challenge.h": "Le défi", "challenge.p": "Une entreprise e-commerce en croissance dépensait un budget important en publicité Instagram mais manquait de visibilité sur les campagnes, types de contenu et horaires de publication offrant le meilleur ROI. Elle avait besoin de :", "challenge.l1": "Une vue consolidée des indicateurs de performance Instagram sur plusieurs comptes", "challenge.l2": "Des informations prédictives pour optimiser les dépenses publicitaires futures", "challenge.l3": "Des rapports automatisés pour économiser des heures d'analyse manuelle chaque semaine", "challenge.l4": "Des recommandations exploitables pour la stratégie de contenu",
+      "solution.h": "La solution", "solution.p": "J'ai créé une plateforme d'analyse de bout en bout qui transforme les données brutes d'Instagram en informations stratégiques :", "solution.l1": "<strong>ETL automatisé :</strong> Des pipelines Talend extraient quotidiennement les données de l'API Instagram, les nettoient et les transforment, puis les chargent dans un entrepôt de données centralisé", "solution.l2": "<strong>Modèles prédictifs :</strong> Des modèles ML Python prévoient les taux d'engagement et les meilleurs horaires de publication à partir des tendances historiques", "solution.l3": "<strong>Tableau de bord interactif :</strong> Des rapports Power BI avec exploration détaillée pour l'analyse des campagnes, du contenu et de l'audience", "solution.l4": "<strong>Optimiseur de budget :</strong> Un algorithme qui recommande la répartition du budget entre les campagnes selon les performances prévues", "solution.l5": "<strong>Alertes automatisées :</strong> Des notifications lorsque les indicateurs s'écartent des plages attendues",
+      "results.h": "Résultats & impact", "results.p": "La plateforme a transformé l'approche du client en matière de marketing Instagram :", "results.r1": "Engagement accru", "results.r2": "Meilleur ROI publicitaire", "results.r3": "Économisées/semaine",
+      "features.h": "Fonctionnalités clés", "features.l1": "<strong>Tableau multi-comptes :</strong> Une vue unifiée sur plusieurs comptes professionnels Instagram", "features.l2": "<strong>Matrice de performance du contenu :</strong> Une analyse visuelle des types de contenu les plus performants", "features.l3": "<strong>Heures de publication optimales :</strong> Des recommandations basées sur le ML pour savoir quand publier", "features.l4": "<strong>Analyse comparative concurrentielle :</strong> Comparez les indicateurs aux moyennes du secteur", "features.l5": "<strong>Analyse des hashtags :</strong> Suivez les hashtags qui génèrent le plus d'engagement", "features.l6": "<strong>Rapports hebdomadaires automatisés :</strong> Des rapports envoyés par e-mail aux parties prenantes",
+      "cta.h": "Vous voulez un meilleur ROI sur les réseaux sociaux ?", "cta.p": "Je peux créer des plateformes d'analyse sur mesure pour optimiser votre publicité et votre stratégie de contenu sur les réseaux sociaux.", "cta.btn": "Discutons de votre projet",
+      "side.info": "Infos du projet", "side.client": "Client", "side.clientVal": "Marque e-commerce", "side.duration": "Durée", "side.durationVal": "En cours", "side.role": "Rôle", "side.roleVal": "Analyste BI & Données", "side.type": "Type", "side.typeVal": "Freelance", "side.tech": "Technologies utilisées", "side.deliverables": "Livrables",
+      "del.1": "Tableau de bord Power BI", "del.2": "Pipeline ETL Talend", "del.3": "Modèles ML Python", "del.4": "Rapports automatisés",
+      "nav.prev": "Projet précédent", "nav.prevTitle": "IA de détection de fraude", "nav.next": "Projet suivant", "nav.nextTitle": "Tableau de bord ventes & KPI",
+      "footer": "© 2024 <span class='footer-gradient'>Bahri Chiraz</span>. Réalisé avec passion à Nabeul, Tunisie."
+    },
+    ar: {
+      "nav.home": "الرئيسية", "nav.allProjects": "كل المشاريع", "nav.p1": "ذكاء كشف الاحتيال", "nav.p2": "تحليلات إنستغرام", "nav.p3": "لوحة المبيعات و KPI", "nav.p4": "تحليل وسائل التواصل", "nav.p5": "تطبيق GMP الجوال", "nav.viewAll": "عرض كل المشاريع",
+      "meta.company": "عمل حر", "meta.date": "📅 أكتوبر 2024 - الحاضر", "meta.status": "📊 مشروع جارٍ",
+      "hero.title": "منصة <span class='gradient-text'>تحليلات</span> إنستغرام",
+      "hero.intro": "منصة لتحليل الأداء والنمذجة التنبؤية لتحسين ميزانيات إعلانات إنستغرام، تضم خطوط بيانات آلية ورؤى مدعومة بالتعلم الآلي ولوحات تفاعلية.",
+      "challenge.h": "التحدي", "challenge.p": "كانت شركة تجارة إلكترونية متنامية تنفق ميزانية كبيرة على إعلانات إنستغرام لكنها تفتقر إلى رؤية حول الحملات وأنواع المحتوى وأوقات النشر التي تحقق أفضل عائد. لقد احتاجت إلى:", "challenge.l1": "رؤية موحدة لمؤشرات أداء إنستغرام عبر حسابات متعددة", "challenge.l2": "رؤى تنبؤية لتحسين الإنفاق الإعلاني المستقبلي", "challenge.l3": "تقارير آلية لتوفير ساعات من التحليل اليدوي أسبوعياً", "challenge.l4": "توصيات قابلة للتنفيذ لاستراتيجية المحتوى",
+      "solution.h": "الحل", "solution.p": "قمت ببناء منصة تحليلات متكاملة تحول بيانات إنستغرام الخام إلى رؤى استراتيجية:", "solution.l1": "<strong>ETL آلي:</strong> تستخرج خطوط Talend البيانات من واجهة Instagram يومياً وتنظفها وتحولها ثم تحملها في مستودع بيانات مركزي", "solution.l2": "<strong>نماذج تنبؤية:</strong> تتنبأ نماذج Python بمعدلات التفاعل وأفضل أوقات النشر بناءً على الأنماط التاريخية", "solution.l3": "<strong>لوحة تفاعلية:</strong> تقارير Power BI مع إمكانيات التعمق لتحليل الحملات والمحتوى والجمهور", "solution.l4": "<strong>محسّن الميزانية:</strong> خوارزمية توصي بتوزيع الميزانية عبر الحملات بناءً على الأداء المتوقع", "solution.l5": "<strong>تنبيهات آلية:</strong> إشعارات عندما تنحرف المؤشرات عن النطاقات المتوقعة",
+      "results.h": "النتائج والأثر", "results.p": "حوّلت المنصة طريقة تعامل العميل مع التسويق عبر إنستغرام:", "results.r1": "تفاعل أعلى", "results.r2": "عائد إعلاني أفضل", "results.r3": "موفرة أسبوعياً",
+      "features.h": "الميزات الرئيسية", "features.l1": "<strong>لوحة متعددة الحسابات:</strong> رؤية موحدة عبر حسابات إنستغرام التجارية المتعددة", "features.l2": "<strong>مصفوفة أداء المحتوى:</strong> تحليل بصري لأنواع المحتوى الأفضل أداءً", "features.l3": "<strong>أوقات النشر المثلى:</strong> توصيات مدعومة بالتعلم الآلي لتحديد وقت النشر", "features.l4": "<strong>مقارنة المنافسين:</strong> قارن المؤشرات بمتوسطات القطاع", "features.l5": "<strong>تحليلات الوسوم:</strong> تتبع الوسوم التي تحقق أكبر تفاعل", "features.l6": "<strong>تقارير أسبوعية آلية:</strong> تقارير مجدولة عبر البريد الإلكتروني لأصحاب المصلحة",
+      "cta.h": "تريد عائداً أفضل من وسائل التواصل؟", "cta.p": "يمكنني بناء منصات تحليلية مخصصة لتحسين إعلاناتك واستراتيجية المحتوى على وسائل التواصل.", "cta.btn": "لنناقش مشروعك",
+      "side.info": "معلومات المشروع", "side.client": "العميل", "side.clientVal": "علامة تجارة إلكترونية", "side.duration": "المدة", "side.durationVal": "مستمر", "side.role": "الدور", "side.roleVal": "محلل بيانات و ذكاء أعمال", "side.type": "النوع", "side.typeVal": "عمل حر", "side.tech": "التقنيات المستخدمة", "side.deliverables": "المخرجات",
+      "del.1": "لوحة Power BI", "del.2": "خط ETL بـ Talend", "del.3": "نماذج Python للتعلم الآلي", "del.4": "تقارير آلية",
+      "nav.prev": "المشروع السابق", "nav.prevTitle": "ذكاء كشف الاحتيال في التأمين", "nav.next": "المشروع التالي", "nav.nextTitle": "لوحة المبيعات و KPI",
+      "footer": "© 2024 <span class='footer-gradient'>Bahri Chiraz</span>. صُنع بشغف في نابل، تونس."
+    }
+  };
+  </script>
+  <script src="/js/i18n-project.js"></script>
+
+</body></html>

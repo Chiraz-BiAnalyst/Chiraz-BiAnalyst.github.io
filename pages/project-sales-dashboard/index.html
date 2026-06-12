@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales &amp; KPI Dashboard | Bahri Chiraz</title>
+  <meta name="description" content="Interactive Power BI dashboard for sales tracking and KPI monitoring - Case study by Bahri Chiraz">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;rect fill='%23a855f7' rx='20' width='100' height='100'/&gt;&lt;text x='50' y='62' font-size='45' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'&gt;BC&lt;/text&gt;&lt;/svg&gt;">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Outfit:wght@300;400;500;600;700;800&amp;family=Noto+Sans+Arabic:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  
+  <style>
+    :root { --bg-primary: #030014; --bg-secondary: #0a0a1f; --accent-purple: #a855f7; --accent-blue: #3b82f6; --accent-cyan: #06b6d4; --neon-purple: #c084fc; --neon-blue: #60a5fa; --text-primary: #ffffff; --text-secondary: rgba(255, 255, 255, 0.6); --text-muted: rgba(255, 255, 255, 0.4); --glass-bg: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.08); --glass-hover: rgba(255, 255, 255, 0.06); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
+    ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: var(--bg-primary); } ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--accent-purple), var(--accent-blue)); border-radius: 4px; }
+    .gradient-orbs { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: orbFloat 20s ease-in-out infinite; }
+    .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%); top: -150px; right: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%); bottom: -100px; left: -100px; animation-delay: -10s; }
+    @keyframes orbFloat { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(30px, -30px) scale(1.05); } }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 1.25rem 3rem; display: flex; justify-content: space-between; align-items: center; background: rgba(3, 0, 20, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); }
+    .logo { font-family: 'Outfit', sans-serif; font-size: 1.75rem; font-weight: 800; background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .back-link { display: flex; align-items: center; gap: 0.5rem; color: var(--text-secondary); text-decoration: none; font-weight: 500; transition: all 0.3s ease; }
+    .back-link:hover { color: var(--accent-purple); gap: 0.75rem; }
+    .back-link svg { width: 20px; height: 20px; }
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
+    .nav-dropdown-btn:hover { color: var(--accent-purple); border-color: var(--accent-purple); }
+    .nav-dropdown-btn svg { width: 16px; height: 16px; transition: transform 0.3s ease; }
+    .nav-dropdown:hover .nav-dropdown-btn svg { transform: rotate(180deg); }
+    .nav-dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 0.5rem; min-width: 260px; background: rgba(10, 10, 31, 0.95); border: 1px solid var(--glass-border); border-radius: 12px; padding: 0.5rem; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; backdrop-filter: blur(20px); }
+    .nav-dropdown:hover .nav-dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+    .nav-dropdown-menu a { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; border-radius: 8px; transition: all 0.2s ease; }
+    .nav-dropdown-menu a:hover { background: var(--glass-hover); color: var(--text-primary); }
+    .nav-dropdown-menu a.active { background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1)); color: var(--neon-purple); }
+    .nav-dropdown-menu a svg { width: 18px; height: 18px; opacity: 0.6; }
+    .nav-dropdown-divider { height: 1px; background: var(--glass-border); margin: 0.5rem 0; }
+    .project-hero { padding: 10rem 3rem 5rem; position: relative; }
+    .project-hero-content { max-width: 1200px; margin: 0 auto; }
+    .project-meta { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+    .project-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 100px; font-size: 0.85rem; color: var(--text-secondary); }
+    .project-badge.company { background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.1)); border-color: var(--accent-purple); color: var(--neon-purple); }
+    .project-hero h1 { font-family: 'Outfit', sans-serif; font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -0.03em; }
+    .project-hero h1 .gradient-text { background: linear-gradient(135deg, var(--neon-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .project-intro { font-size: 1.25rem; color: var(--text-secondary); max-width: 700px; line-height: 1.7; margin-bottom: 2rem; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .project-tag { padding: 0.5rem 1rem; background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1)); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 100px; font-size: 0.9rem; font-weight: 500; color: var(--neon-purple); }
+    .project-gallery { padding: 0 3rem 5rem; }
+    .gallery-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+    .gallery-main { grid-row: span 2; border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
+    .gallery-main img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-thumb { border-radius: 16px; overflow: hidden; border: 1px solid var(--glass-border); transition: all 0.3s ease; }
+    .gallery-thumb:hover { border-color: var(--accent-purple); transform: scale(1.02); }
+    .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .project-content { max-width: 1200px; margin: 0 auto; padding: 0 3rem; }
+    .content-grid { display: grid; grid-template-columns: 1fr 350px; gap: 4rem; }
+    .content-main { display: flex; flex-direction: column; gap: 4rem; }
+    .content-section h2 { font-family: 'Outfit', sans-serif; font-size: 1.75rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.75rem; }
+    .content-section h2 .icon { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(6, 182, 212, 0.2)); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+    .content-section p { color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; margin-bottom: 1rem; }
+    .content-section ul { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+    .content-section li { color: var(--text-secondary); font-size: 1rem; padding-left: 1.75rem; position: relative; line-height: 1.7; }
+    .content-section li::before { content: '→'; position: absolute; left: 0; color: var(--accent-purple); font-weight: 600; }
+    .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1.5rem; }
+    .result-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; text-align: center; transition: all 0.3s ease; }
+    .result-card:hover { border-color: var(--accent-purple); transform: translateY(-5px); }
+    .result-value { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--neon-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.25rem; }
+    .result-label { color: var(--text-secondary); font-size: 0.9rem; }
+    .content-sidebar { display: flex; flex-direction: column; gap: 2rem; }
+    .sidebar-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 1.75rem; }
+    .sidebar-card h3 { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--text-primary); }
+    .info-list { display: flex; flex-direction: column; gap: 1rem; }
+    .info-item { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; border-bottom: 1px solid var(--glass-border); }
+    .info-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .info-label { color: var(--text-muted); font-size: 0.9rem; }
+    .info-value { color: var(--text-primary); font-weight: 600; font-size: 0.95rem; }
+    .tech-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tech-item { padding: 0.4rem 0.85rem; background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1)); border-radius: 100px; font-size: 0.8rem; font-weight: 500; color: var(--neon-purple); }
+    .project-cta { margin-top: 5rem; padding: 4rem; background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.05)); border: 1px solid var(--glass-border); border-radius: 24px; text-align: center; }
+    .project-cta h3 { font-family: 'Outfit', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+    .project-cta p { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 2rem; border-radius: 12px; font-size: 1rem; font-weight: 600; text-decoration: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; border: none; font-family: inherit; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue)); color: white; box-shadow: 0 0 30px rgba(168, 85, 247, 0.4); }
+    .btn-primary:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 0 50px rgba(168, 85, 247, 0.6); }
+    .project-nav { max-width: 1200px; margin: 5rem auto 0; padding: 3rem; display: flex; justify-content: space-between; border-top: 1px solid var(--glass-border); }
+    .nav-item { display: flex; flex-direction: column; gap: 0.5rem; text-decoration: none; transition: all 0.3s ease; }
+    .nav-item:hover { transform: translateX(10px); }
+    .nav-item.prev:hover { transform: translateX(-10px); }
+    .nav-item.next { text-align: right; align-items: flex-end; }
+    .nav-label { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 0.5rem; }
+    .nav-title { color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700; }
+    .nav-item:hover .nav-title { color: var(--accent-purple); }
+    footer { padding: 3rem; text-align: center; border-top: 1px solid var(--glass-border); margin-top: 3rem; }
+    footer p { color: var(--text-muted); font-size: 0.9rem; }
+    footer .footer-gradient { background: linear-gradient(90deg, var(--neon-purple), var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 600; }
+    @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } .content-sidebar { flex-direction: row; flex-wrap: wrap; } .sidebar-card { flex: 1; min-width: 280px; } .gallery-grid { grid-template-columns: 1fr; } .gallery-main { grid-row: auto; } }
+    @media (max-width: 768px) { nav { padding: 1rem 1.5rem; } .project-hero { padding: 8rem 1.5rem 3rem; } .project-gallery { padding: 0 1.5rem 3rem; } .project-content { padding: 0 1.5rem; } .results-grid { grid-template-columns: 1fr; } .project-cta { padding: 2rem; margin-top: 3rem; } .project-nav { flex-direction: column; gap: 2rem; padding: 2rem 1.5rem; } .nav-item.next { text-align: left; align-items: flex-start; } }
+    @media (max-width: 480px) { nav { padding: 0.85rem 1rem; } .nav-links { gap: 0.5rem; } .back-link span { display: none; } .nav-dropdown-btn { padding: 0.45rem 0.7rem; font-size: 0.8rem; } .nav-dropdown-menu { min-width: 210px; } .lang-switcher { gap: 0.25rem; } .lang-btn { padding: 0.3rem 0.5rem; font-size: 0.72rem; } .project-hero { padding: 7rem 1.1rem 2.5rem; } .project-gallery { padding: 0 1.1rem 2.5rem; } .project-content { padding: 0 1.1rem; } .project-intro { font-size: 1.05rem; } .project-cta { padding: 1.75rem 1.25rem; } .project-cta h3 { font-size: 1.5rem; } .cta-buttons { flex-direction: column; } .cta-buttons .btn { width: 100%; justify-content: center; } .content-section h2 { font-size: 1.4rem; } .result-value { font-size: 2rem; } }
+    .analysis-gallery { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .analysis-gallery figure { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; }
+    .analysis-gallery figure:hover { border-color: var(--accent-purple); transform: translateY(-4px); }
+    .analysis-gallery img { width: 100%; height: auto; display: block; }
+    .analysis-gallery figcaption { padding: 0.85rem 1.1rem; color: var(--text-secondary); font-size: 0.9rem; border-top: 1px solid var(--glass-border); }
+    @media (max-width: 768px) { .analysis-gallery { grid-template-columns: 1fr; } }
+    .fade-in { opacity: 0; transform: translateY(30px); animation: fadeIn 0.8s ease forwards; }
+    .fade-in-delay-1 { animation-delay: 0.1s; } .fade-in-delay-2 { animation-delay: 0.2s; } .fade-in-delay-3 { animation-delay: 0.3s; } .fade-in-delay-4 { animation-delay: 0.4s; }
+    @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+    .lang-switcher { display: flex; gap: 0.4rem; align-items: center; }
+    .lang-btn { padding: 0.35rem 0.7rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-secondary); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
+    .lang-btn:hover, .lang-btn.active { background: var(--accent-purple); border-color: var(--accent-purple); color: white; }
+    [dir="rtl"] body { font-family: 'Noto Sans Arabic', 'Space Grotesk', sans-serif; }
+    [dir="rtl"] .back-link svg, [dir="rtl"] .nav-item svg, [dir="rtl"] .project-cta .btn svg { transform: scaleX(-1); }
+  </style>
+<script src="https://cdn.moda.app/runtime-libs/tailwind-browser-4.1.13-index.global.min.js"></script><style data-moda-export-fonts="true">@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Space Grotesk'; src: url("../../fonts/spacegrotesk-wght--bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--thin.ttf") format("truetype"); font-style: normal; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--extralight.ttf") format("truetype"); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--extrabold.ttf") format("truetype"); font-style: normal; font-weight: 800; font-display: swap; }
+@font-face { font-family: 'Noto Sans Arabic'; src: url("../../fonts/notosansarabic-wdth-wght--black.ttf") format("truetype"); font-style: normal; font-weight: 900; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--thin.ttf") format("truetype"); font-style: normal; font-weight: 100; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--extralight.ttf") format("truetype"); font-style: normal; font-weight: 200; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--light.ttf") format("truetype"); font-style: normal; font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--regular.ttf") format("truetype"); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--medium.ttf") format("truetype"); font-style: normal; font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--semibold.ttf") format("truetype"); font-style: normal; font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--bold.ttf") format("truetype"); font-style: normal; font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--extrabold.ttf") format("truetype"); font-style: normal; font-weight: 800; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url("../../fonts/outfit-wght--black.ttf") format("truetype"); font-style: normal; font-weight: 900; font-display: swap; }</style></head>
+<body>
+  <div class="gradient-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+
+  <nav>
+    <a href="/" class="logo">BC</a>
+    <div class="nav-links">
+      <a href="/" class="back-link">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+        <span data-i18n="nav.home">Home</span>
+      </a>
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-btn">
+          <span data-i18n="nav.allProjects">All Projects</span>
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/project-fraud-detection">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            <span data-i18n="nav.p1">Fraud Detection AI</span>
+          </a>
+          <a href="/project-instagram-analytics">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            <span data-i18n="nav.p2">Instagram Analytics</span>
+          </a>
+          <a href="/project-sales-dashboard" class="active">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            <span data-i18n="nav.p3">Sales &amp; KPI Dashboard</span>
+          </a>
+          <a href="/project-social-media">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+            <span data-i18n="nav.p4">Social Media Analysis</span>
+          </a>
+          <a href="/project-gmp-app">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+            <span data-i18n="nav.p5">GMP Mobile App</span>
+          </a>
+          <div class="nav-dropdown-divider"></div>
+          <a href="/#projects">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+            <span data-i18n="nav.viewAll">View All Projects</span>
+          </a>
+        </div>
+      </div>
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="fr">FR</button>
+        <button class="lang-btn" data-lang="ar">عربي</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="project-hero">
+    <div class="project-hero-content">
+      <div class="project-meta fade-in">
+        <span class="project-badge company" data-i18n="meta.company">Freelance</span>
+        <span class="project-badge" data-i18n="meta.date">📅 Oct 2024 - Present</span>
+        <span class="project-badge" data-i18n="meta.status">📊 Business Intelligence</span>
+      </div>
+      <h1 class="fade-in fade-in-delay-1" data-i18n-html="hero.title">
+        Sales &amp; <span class="gradient-text">KPI Dashboard</span>
+      </h1>
+      <p class="project-intro fade-in fade-in-delay-2" data-i18n="hero.intro">
+        Interactive Power BI dashboard suite for real-time sales tracking, order management, and comprehensive KPI monitoring with drill-through analytics and automated reporting.
+      </p>
+      <div class="project-tags fade-in fade-in-delay-3">
+        <span class="project-tag">Power BI</span>
+        <span class="project-tag">DAX</span>
+        <span class="project-tag">Power Query</span>
+        <span class="project-tag">ETL</span>
+        <span class="project-tag">SQL</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="project-gallery fade-in fade-in-delay-4">
+    <div class="analysis-gallery">
+      <figure>
+        <img src="../../images/ee08ee44-fcb0-45bf-b837-d56fbf9ffa41.png" alt="Power BI KPI overview dashboard">
+        <figcaption data-i18n="gal.1">Power BI — KPI overview: debtors, receivables, payments &amp; recovery rate</figcaption>
+      </figure>
+      <figure>
+        <img src="../../images/f1bf5ecd-9b7c-41db-9e9a-ae23ca924b09.png" alt="Power BI 2024 product sales report">
+        <figcaption data-i18n="gal.2">Power BI — 2024 product sales report: revenue by month, category &amp; segment</figcaption>
+      </figure>
+      <figure>
+        <img src="../../images/d517bfcc-2dbc-45c3-8df0-74aac4eea687.png" alt="Power BI fees and parties analysis dashboard">
+        <figcaption data-i18n="gal.3">Power BI — fees &amp; parties: VAT breakdown and fees by name &amp; region</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="project-content">
+    <div class="content-grid">
+      <div class="content-main">
+        
+        <section class="content-section">
+          <h2><span class="icon">🎯</span> <span data-i18n="challenge.h">The Challenge</span></h2>
+          <p data-i18n="challenge.p">
+            A retail business with multiple sales channels struggled to consolidate their sales data and track performance in real-time. Their challenges included:
+          </p>
+          <ul>
+            <li data-i18n="challenge.l1">Data scattered across multiple systems (POS, e-commerce, wholesale)</li>
+            <li data-i18n="challenge.l2">Manual Excel reporting taking 10+ hours weekly</li>
+            <li data-i18n="challenge.l3">Delayed insights leading to missed opportunities</li>
+            <li data-i18n="challenge.l4">No visibility into regional or product-level performance</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2><span class="icon">💡</span> <span data-i18n="solution.h">The Solution</span></h2>
+          <p data-i18n="solution.p">
+            I designed and built a comprehensive Power BI dashboard ecosystem:
+          </p>
+          <ul>
+            <li data-i18n-html="solution.l1"><strong>Data Integration:</strong> Power Query pipelines to consolidate data from all sales channels into a unified data model</li>
+            <li data-i18n-html="solution.l2"><strong>Executive Dashboard:</strong> High-level KPI overview with revenue, margins, growth trends, and targets</li>
+            <li data-i18n-html="solution.l3"><strong>Sales Analysis:</strong> Drill-through reports by region, product category, sales rep, and time period</li>
+            <li data-i18n-html="solution.l4"><strong>Order Tracking:</strong> Real-time order status, fulfillment metrics, and delivery performance</li>
+            <li data-i18n-html="solution.l5"><strong>Advanced DAX:</strong> Complex measures for YoY growth, rolling averages, and dynamic targets</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2><span class="icon">📈</span> <span data-i18n="results.h">Results &amp; Impact</span></h2>
+          <p data-i18n="results.p">
+            The dashboard transformed decision-making across the organization:
+          </p>
+          <div class="results-grid">
+            <div class="result-card">
+              <div class="result-value" data-i18n="results.v1">Real-time</div>
+              <div class="result-label" data-i18n="results.r1">Data Visibility</div>
+            </div>
+            <div class="result-card">
+              <div class="result-value">90%</div>
+              <div class="result-label" data-i18n="results.r2">Less Reporting Time</div>
+            </div>
+            <div class="result-card">
+              <div class="result-value">15%</div>
+              <div class="result-label" data-i18n="results.r3">Sales Increase</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2><span class="icon">⚙️</span> <span data-i18n="features.h">Key Features</span></h2>
+          <ul>
+            <li data-i18n-html="features.l1"><strong>Interactive Filters:</strong> Slice data by date, region, category, customer segment</li>
+            <li data-i18n-html="features.l2"><strong>Trend Analysis:</strong> Visualize sales patterns, seasonality, and growth trajectories</li>
+            <li data-i18n-html="features.l3"><strong>Target Tracking:</strong> Compare actual vs. target with variance analysis</li>
+            <li data-i18n-html="features.l4"><strong>Top/Bottom Analysis:</strong> Identify best and worst performing products/regions</li>
+            <li data-i18n-html="features.l5"><strong>Mobile Optimized:</strong> Responsive design for mobile viewing</li>
+            <li data-i18n-html="features.l6"><strong>Scheduled Refresh:</strong> Automatic data updates multiple times daily</li>
+          </ul>
+        </section>
+
+        <div class="project-cta">
+          <h3 data-i18n="cta.h">Need a Custom Dashboard?</h3>
+          <p data-i18n="cta.p">I can build interactive Power BI dashboards that give you real-time visibility into your business performance.</p>
+          <div class="cta-buttons">
+            <a href="/#contact" class="btn btn-primary">
+              <span data-i18n="cta.btn">Let's Discuss Your Project</span>
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <aside class="content-sidebar">
+        <div class="sidebar-card">
+          <h3 data-i18n="side.info">Project Info</h3>
+          <div class="info-list">
+            <div class="info-item"><span class="info-label" data-i18n="side.client">Client</span><span class="info-value" data-i18n="side.clientVal">Retail Business</span></div>
+            <div class="info-item"><span class="info-label" data-i18n="side.duration">Duration</span><span class="info-value" data-i18n="side.durationVal">Ongoing</span></div>
+            <div class="info-item"><span class="info-label" data-i18n="side.role">Role</span><span class="info-value" data-i18n="side.roleVal">BI Developer</span></div>
+            <div class="info-item"><span class="info-label" data-i18n="side.type">Type</span><span class="info-value" data-i18n="side.typeVal">Freelance</span></div>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h3 data-i18n="side.tech">Technologies Used</h3>
+          <div class="tech-list">
+            <span class="tech-item">Power BI</span>
+            <span class="tech-item">DAX</span>
+            <span class="tech-item">Power Query</span>
+            <span class="tech-item">M Language</span>
+            <span class="tech-item">SQL Server</span>
+            <span class="tech-item">Excel</span>
+          </div>
+        </div>
+
+        <div class="sidebar-card">
+          <h3 data-i18n="side.deliverables">Deliverables</h3>
+          <div class="info-list">
+            <div class="info-item"><span class="info-value" data-i18n="del.1">Executive Dashboard</span></div>
+            <div class="info-item"><span class="info-value" data-i18n="del.2">Sales Analysis Reports</span></div>
+            <div class="info-item"><span class="info-value" data-i18n="del.3">Order Tracking Dashboard</span></div>
+            <div class="info-item"><span class="info-value" data-i18n="del.4">Data Model Documentation</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <nav class="project-nav">
+      <a href="/project-instagram-analytics" class="nav-item prev">
+        <span class="nav-label"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg> <span data-i18n="nav.prev">Previous Project</span></span>
+        <span class="nav-title" data-i18n="nav.prevTitle">Instagram Analytics Platform</span>
+      </a>
+      <a href="/project-social-media" class="nav-item next">
+        <span class="nav-label"><span data-i18n="nav.next">Next Project</span> <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></span>
+        <span class="nav-title" data-i18n="nav.nextTitle">Social Media Analysis</span>
+      </a>
+    </nav>
+  </div>
+
+  <footer>
+    <p data-i18n-html="footer">© 2024 <span class="footer-gradient">Bahri Chiraz</span>. Crafted with passion in Nabeul, Tunisia.</p>
+  </footer>
+
+  <script>
+  window.PAGE_TRANSLATIONS = {
+    en: {
+      "nav.home": "Home", "nav.allProjects": "All Projects", "nav.p1": "Fraud Detection AI", "nav.p2": "Instagram Analytics", "nav.p3": "Sales & KPI Dashboard", "nav.p4": "Social Media Analysis", "nav.p5": "GMP Mobile App", "nav.viewAll": "View All Projects",
+      "meta.company": "Freelance", "meta.date": "📅 Oct 2024 - Present", "meta.status": "📊 Business Intelligence",
+      "hero.title": "Sales & <span class='gradient-text'>KPI Dashboard</span>",
+      "hero.intro": "Interactive Power BI dashboard suite for real-time sales tracking, order management, and comprehensive KPI monitoring with drill-through analytics and automated reporting.",
+      "gal.1": "Power BI — KPI overview: debtors, receivables, payments & recovery rate", "gal.2": "Power BI — 2024 product sales report: revenue by month, category & segment", "gal.3": "Power BI — fees & parties: VAT breakdown and fees by name & region",
+      "challenge.h": "The Challenge", "challenge.p": "A retail business with multiple sales channels struggled to consolidate their sales data and track performance in real-time. Their challenges included:", "challenge.l1": "Data scattered across multiple systems (POS, e-commerce, wholesale)", "challenge.l2": "Manual Excel reporting taking 10+ hours weekly", "challenge.l3": "Delayed insights leading to missed opportunities", "challenge.l4": "No visibility into regional or product-level performance",
+      "solution.h": "The Solution", "solution.p": "I designed and built a comprehensive Power BI dashboard ecosystem:", "solution.l1": "<strong>Data Integration:</strong> Power Query pipelines to consolidate data from all sales channels into a unified data model", "solution.l2": "<strong>Executive Dashboard:</strong> High-level KPI overview with revenue, margins, growth trends, and targets", "solution.l3": "<strong>Sales Analysis:</strong> Drill-through reports by region, product category, sales rep, and time period", "solution.l4": "<strong>Order Tracking:</strong> Real-time order status, fulfillment metrics, and delivery performance", "solution.l5": "<strong>Advanced DAX:</strong> Complex measures for YoY growth, rolling averages, and dynamic targets",
+      "results.h": "Results & Impact", "results.p": "The dashboard transformed decision-making across the organization:", "results.v1": "Real-time", "results.r1": "Data Visibility", "results.r2": "Less Reporting Time", "results.r3": "Sales Increase",
+      "features.h": "Key Features", "features.l1": "<strong>Interactive Filters:</strong> Slice data by date, region, category, customer segment", "features.l2": "<strong>Trend Analysis:</strong> Visualize sales patterns, seasonality, and growth trajectories", "features.l3": "<strong>Target Tracking:</strong> Compare actual vs. target with variance analysis", "features.l4": "<strong>Top/Bottom Analysis:</strong> Identify best and worst performing products/regions", "features.l5": "<strong>Mobile Optimized:</strong> Responsive design for mobile viewing", "features.l6": "<strong>Scheduled Refresh:</strong> Automatic data updates multiple times daily",
+      "cta.h": "Need a Custom Dashboard?", "cta.p": "I can build interactive Power BI dashboards that give you real-time visibility into your business performance.", "cta.btn": "Let's Discuss Your Project",
+      "side.info": "Project Info", "side.client": "Client", "side.clientVal": "Retail Business", "side.duration": "Duration", "side.durationVal": "Ongoing", "side.role": "Role", "side.roleVal": "BI Developer", "side.type": "Type", "side.typeVal": "Freelance", "side.tech": "Technologies Used", "side.deliverables": "Deliverables",
+      "del.1": "Executive Dashboard", "del.2": "Sales Analysis Reports", "del.3": "Order Tracking Dashboard", "del.4": "Data Model Documentation",
+      "nav.prev": "Previous Project", "nav.prevTitle": "Instagram Analytics Platform", "nav.next": "Next Project", "nav.nextTitle": "Social Media Analysis",
+      "footer": "© 2024 <span class='footer-gradient'>Bahri Chiraz</span>. Crafted with passion in Nabeul, Tunisia."
+    },
+    fr: {
+      "nav.home": "Accueil", "nav.allProjects": "Tous les projets", "nav.p1": "IA de détection de fraude", "nav.p2": "Analyse Instagram", "nav.p3": "Tableau de bord ventes & KPI", "nav.p4": "Analyse des réseaux sociaux", "nav.p5": "Application mobile GMP", "nav.viewAll": "Voir tous les projets",
+      "meta.company": "Freelance", "meta.date": "📅 Oct 2024 - Présent", "meta.status": "📊 Business Intelligence",
+      "hero.title": "Tableau de bord <span class='gradient-text'>ventes & KPI</span>",
+      "hero.intro": "Suite de tableaux de bord Power BI interactifs pour le suivi des ventes en temps réel, la gestion des commandes et le suivi complet des KPI avec analyses détaillées et rapports automatisés.",
+      "gal.1": "Power BI — aperçu des KPI : débiteurs, créances, paiements & taux de recouvrement", "gal.2": "Power BI — rapport des ventes produits 2024 : revenus par mois, catégorie & segment", "gal.3": "Power BI — frais & parties : ventilation de la TVA et frais par nom & région",
+      "challenge.h": "Le défi", "challenge.p": "Une entreprise de vente au détail avec plusieurs canaux de vente peinait à consolider ses données de vente et à suivre les performances en temps réel. Ses défis comprenaient :", "challenge.l1": "Des données dispersées sur plusieurs systèmes (PDV, e-commerce, gros)", "challenge.l2": "Des rapports Excel manuels prenant plus de 10 heures par semaine", "challenge.l3": "Des informations tardives menant à des opportunités manquées", "challenge.l4": "Aucune visibilité sur les performances régionales ou par produit",
+      "solution.h": "La solution", "solution.p": "J'ai conçu et créé un écosystème complet de tableaux de bord Power BI :", "solution.l1": "<strong>Intégration des données :</strong> Des pipelines Power Query pour consolider les données de tous les canaux de vente dans un modèle de données unifié", "solution.l2": "<strong>Tableau de bord exécutif :</strong> Un aperçu des KPI de haut niveau avec revenus, marges, tendances de croissance et objectifs", "solution.l3": "<strong>Analyse des ventes :</strong> Des rapports détaillés par région, catégorie de produit, commercial et période", "solution.l4": "<strong>Suivi des commandes :</strong> Statut des commandes en temps réel, indicateurs d'exécution et performance de livraison", "solution.l5": "<strong>DAX avancé :</strong> Des mesures complexes pour la croissance annuelle, les moyennes mobiles et les objectifs dynamiques",
+      "results.h": "Résultats & impact", "results.p": "Le tableau de bord a transformé la prise de décision dans toute l'organisation :", "results.v1": "Temps réel", "results.r1": "Visibilité des données", "results.r2": "Temps de reporting en moins", "results.r3": "Hausse des ventes",
+      "features.h": "Fonctionnalités clés", "features.l1": "<strong>Filtres interactifs :</strong> Segmentez les données par date, région, catégorie, segment de clientèle", "features.l2": "<strong>Analyse des tendances :</strong> Visualisez les schémas de vente, la saisonnalité et les trajectoires de croissance", "features.l3": "<strong>Suivi des objectifs :</strong> Comparez le réel à l'objectif avec analyse des écarts", "features.l4": "<strong>Analyse top/flop :</strong> Identifiez les produits/régions les plus et les moins performants", "features.l5": "<strong>Optimisé pour mobile :</strong> Un design responsive pour la consultation mobile", "features.l6": "<strong>Actualisation planifiée :</strong> Des mises à jour automatiques des données plusieurs fois par jour",
+      "cta.h": "Besoin d'un tableau de bord sur mesure ?", "cta.p": "Je peux créer des tableaux de bord Power BI interactifs qui vous donnent une visibilité en temps réel sur les performances de votre entreprise.", "cta.btn": "Discutons de votre projet",
+      "side.info": "Infos du projet", "side.client": "Client", "side.clientVal": "Entreprise de vente au détail", "side.duration": "Durée", "side.durationVal": "En cours", "side.role": "Rôle", "side.roleVal": "Développeur BI", "side.type": "Type", "side.typeVal": "Freelance", "side.tech": "Technologies utilisées", "side.deliverables": "Livrables",
+      "del.1": "Tableau de bord exécutif", "del.2": "Rapports d'analyse des ventes", "del.3": "Tableau de suivi des commandes", "del.4": "Documentation du modèle de données",
+      "nav.prev": "Projet précédent", "nav.prevTitle": "Plateforme d'analyse Instagram", "nav.next": "Projet suivant", "nav.nextTitle": "Analyse des réseaux sociaux",
+      "footer": "© 2024 <span class='footer-gradient'>Bahri Chiraz</span>. Réalisé avec passion à Nabeul, Tunisie."
+    },
+    ar: {
+      "nav.home": "الرئيسية", "nav.allProjects": "كل المشاريع", "nav.p1": "ذكاء كشف الاحتيال", "nav.p2": "تحليلات إنستغرام", "nav.p3": "لوحة المبيعات و KPI", "nav.p4": "تحليل وسائل التواصل", "nav.p5": "تطبيق GMP الجوال", "nav.viewAll": "عرض كل المشاريع",
+      "meta.company": "عمل حر", "meta.date": "📅 أكتوبر 2024 - الحاضر", "meta.status": "📊 ذكاء الأعمال",
+      "hero.title": "لوحة <span class='gradient-text'>المبيعات و KPI</span>",
+      "hero.intro": "مجموعة لوحات Power BI تفاعلية لتتبع المبيعات في الوقت الفعلي وإدارة الطلبات ومراقبة شاملة لمؤشرات الأداء مع تحليلات معمقة وتقارير آلية.",
+      "gal.1": "Power BI — نظرة عامة على المؤشرات: المدينون والذمم والمدفوعات ومعدل التحصيل", "gal.2": "Power BI — تقرير مبيعات المنتجات 2024: الإيرادات حسب الشهر والفئة والقطاع", "gal.3": "Power BI — الرسوم والأطراف: تفصيل ضريبة القيمة المضافة والرسوم حسب الاسم والمنطقة",
+      "challenge.h": "التحدي", "challenge.p": "واجهت شركة تجزئة متعددة قنوات البيع صعوبة في توحيد بيانات مبيعاتها وتتبع الأداء في الوقت الفعلي. شملت تحدياتها:", "challenge.l1": "بيانات مبعثرة عبر أنظمة متعددة (نقاط البيع، التجارة الإلكترونية، الجملة)", "challenge.l2": "تقارير Excel يدوية تستغرق أكثر من 10 ساعات أسبوعياً", "challenge.l3": "رؤى متأخرة تؤدي إلى فرص ضائعة", "challenge.l4": "انعدام الرؤية حول الأداء الإقليمي أو على مستوى المنتج",
+      "solution.h": "الحل", "solution.p": "قمت بتصميم وبناء منظومة شاملة من لوحات Power BI:", "solution.l1": "<strong>دمج البيانات:</strong> خطوط Power Query لتوحيد البيانات من جميع قنوات البيع في نموذج بيانات موحد", "solution.l2": "<strong>لوحة تنفيذية:</strong> نظرة عامة عالية المستوى على المؤشرات تشمل الإيرادات والهوامش واتجاهات النمو والأهداف", "solution.l3": "<strong>تحليل المبيعات:</strong> تقارير معمقة حسب المنطقة وفئة المنتج ومندوب المبيعات والفترة الزمنية", "solution.l4": "<strong>تتبع الطلبات:</strong> حالة الطلبات في الوقت الفعلي ومقاييس التنفيذ وأداء التسليم", "solution.l5": "<strong>DAX متقدم:</strong> مقاييس معقدة للنمو السنوي والمتوسطات المتحركة والأهداف الديناميكية",
+      "results.h": "النتائج والأثر", "results.p": "حوّلت اللوحة صنع القرار في جميع أنحاء المؤسسة:", "results.v1": "فوري", "results.r1": "رؤية البيانات", "results.r2": "وقت أقل للتقارير", "results.r3": "زيادة المبيعات",
+      "features.h": "الميزات الرئيسية", "features.l1": "<strong>مرشحات تفاعلية:</strong> قسّم البيانات حسب التاريخ والمنطقة والفئة وشريحة العملاء", "features.l2": "<strong>تحليل الاتجاهات:</strong> تصور أنماط المبيعات والموسمية ومسارات النمو", "features.l3": "<strong>تتبع الأهداف:</strong> قارن الفعلي بالهدف مع تحليل الفروقات", "features.l4": "<strong>تحليل الأفضل/الأسوأ:</strong> حدد المنتجات/المناطق الأفضل والأسوأ أداءً", "features.l5": "<strong>محسّن للجوال:</strong> تصميم متجاوب للعرض على الجوال", "features.l6": "<strong>تحديث مجدول:</strong> تحديثات بيانات آلية عدة مرات يومياً",
+      "cta.h": "تحتاج لوحة مخصصة؟", "cta.p": "يمكنني بناء لوحات Power BI تفاعلية تمنحك رؤية فورية لأداء عملك.", "cta.btn": "لنناقش مشروعك",
+      "side.info": "معلومات المشروع", "side.client": "العميل", "side.clientVal": "شركة تجزئة", "side.duration": "المدة", "side.durationVal": "مستمر", "side.role": "الدور", "side.roleVal": "مطور ذكاء أعمال", "side.type": "النوع", "side.typeVal": "عمل حر", "side.tech": "التقنيات المستخدمة", "side.deliverables": "المخرجات",
+      "del.1": "لوحة تنفيذية", "del.2": "تقارير تحليل المبيعات", "del.3": "لوحة تتبع الطلبات", "del.4": "توثيق نموذج البيانات",
+      "nav.prev": "المشروع السابق", "nav.prevTitle": "منصة تحليلات إنستغرام", "nav.next": "المشروع التالي", "nav.nextTitle": "تحليل وسائل التواصل",
+      "footer": "© 2024 <span class='footer-gradient'>Bahri Chiraz</span>. صُنع بشغف في نابل، تونس."
+    }
+  };
+  </script>
+  <script src="/js/i18n-project.js"></script>
+
+</body></html>
